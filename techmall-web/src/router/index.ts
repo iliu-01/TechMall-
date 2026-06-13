@@ -3,7 +3,7 @@ import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(),
-  scrollBehavior(to, from, savedPosition) {
+  scrollBehavior(to, _from, savedPosition) {
     // 如果设置了 scrollToTop 标记，强制置顶
     if (to.query._top === '1') {
       return { top: 0 }
