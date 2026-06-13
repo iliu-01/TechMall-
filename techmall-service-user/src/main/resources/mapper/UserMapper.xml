@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.techmall.user.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.techmall.user.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="role" property="role"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
+        FROM `user`
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
+        FROM `user`
+        WHERE username = #{username}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
+        FROM `user`
+        <where>
+            <if test="role != null and role != ''">
+                AND role = #{role}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%')
+                     OR nickname LIKE CONCAT('%', #{keyword}, '%')
+                     OR phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <insert id="insert" parameterType="com.techmall.user.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `user` (username, password, nickname, phone, email, role, status, created_at, updated_at)
+        VALUES (#{username}, #{password}, #{nickname}, #{phone}, #{email}, #{role}, #{status}, NOW(), NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.techmall.user.entity.User">
+        UPDATE `user`
+        <set>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE `user`
+        SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

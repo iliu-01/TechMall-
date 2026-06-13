@@ -1,0 +1,174 @@
+package com.techmall.order.service.impl;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.techmall.common.dto.PageDTO;
+import com.techmall.common.exception.BusinessException;
+import com.techmall.common.result.Result;
+import com.techmall.common.result.ResultCode;
+import com.techmall.order.dto.CreateOrderDTO;
+import com.techmall.order.dto.OrderItemDTO;
+import com.techmall.order.entity.Order;
+import com.techmall.order.entity.OrderItem;
+import com.techmall.order.feign.ProductFeignClient;
+import com.techmall.order.mapper.OrderItemMapper;
+import com.techmall.order.mapper.OrderMapper;
+import com.techmall.order.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService {
+
+    private final OrderMapper orderMapper;
+    private final OrderItemMapper orderItemMapper;
+    private final ProductFeignClient productFeignClient;
+
+    private static final Set<String> VALID_STATUSES = Set.of("PENDING", "PAID", "SHIPPED", "DELIVERED", "COMPLETED", "CANCELLED");
+    private static final Map<String, Set<String>> ALLOWED_TRANSITIONS = Map.of(
+        "PENDING", Set.of("PAID", "CANCELLED"),
+        "PAID", Set.of("SHIPPED", "CANCELLED"),
+        "SHIPPED", Set.of("DELIVERED"),
+        "DELIVERED", Set.of("COMPLETED"),
+        "COMPLETED", Set.of(),
+        "CANCELLED", Set.of()
+    );
+
+    @Override
+    @SentinelResource(value = "createOrder", fallback = "createOrderFallback")
+    @Transactional
+    public Result<?> createOrder(CreateOrderDTO dto, Long userId) {
+        // 1. 遍历 items，逐个调用 productFeignClient.getProduct() 获取价格
+        BigDecimal total = BigDecimal.ZERO;
+        List<OrderItem> items = new ArrayList<>();
+        for (OrderItemDTO item : dto.getItems()) {
+            Result<?> pr = productFeignClient.getProduct(item.getProductId());
+            if (pr.getCode() != 200) {
+                throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND);
+            }
+            @SuppressWarnings("unchecked")
+            Map<String, Object> pd = (Map<String, Object>) pr.getData();
+            String name = (String) pd.get("name");
+            BigDecimal price = new BigDecimal(pd.get("price").toString());
+            // 从商品数据中获取 merchantId，存入订单项(冗余，避免跨库JOIN)
+            Long merchantId = pd.get("merchantId") != null
+                    ? Long.valueOf(pd.get("merchantId").toString()) : 0L;
+
+            OrderItem oi = new OrderItem();
+            oi.setProductId(item.getProductId());
+            oi.setMerchantId(merchantId);
+            oi.setProductName(name);
+            oi.setProductPrice(price);
+            oi.setQuantity(item.getQuantity());
+            oi.setAmount(price.multiply(BigDecimal.valueOf(item.getQuantity())));
+            items.add(oi);
+            total = total.add(oi.getAmount());
+        }
+        // 2. 创建订单
+        Order order = new Order();
+        order.setOrderNo("TM" + System.currentTimeMillis());
+        order.setUserId(userId);
+        order.setTotalAmount(total);
+        order.setStatus("PENDING");
+        order.setReceiverName(dto.getReceiverName());
+        order.setReceiverPhone(dto.getReceiverPhone());
+        order.setReceiverAddr(dto.getReceiverAddr());
+        orderMapper.insert(order);
+        // 3. 保存订单项 + 扣库存
+        for (OrderItem oi : items) {
+            oi.setOrderId(order.getId());
+            orderItemMapper.insert(oi);
+            Map<String, Integer> stockBody = new HashMap<>();
+            stockBody.put("quantity", oi.getQuantity());
+            productFeignClient.deductStock(oi.getProductId(), stockBody);
+        }
+        return Result.success(order);
+    }
+
+    public Result<?> createOrderFallback(CreateOrderDTO dto, Long userId, Throwable t) {
+        log.error("createOrder fallback triggered, userId={}, error={}", userId, t.getMessage());
+        return Result.fail(ResultCode.SERVICE_BUSY);
+    }
+
+    @Override
+    public Result<?> getMyOrders(Long userId, int page, int size) {
+        PageHelper.startPage(page, size);
+        List<Order> orders = orderMapper.selectByUserId(userId);
+        PageInfo<Order> pageInfo = new PageInfo<>(orders);
+        PageDTO<Order> pageDTO = PageDTO.of(pageInfo.getList(), pageInfo.getTotal(), page, size);
+        return Result.success(pageDTO);
+    }
+
+    @Override
+    public Result<?> getOrderDetail(Long orderId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        }
+        List<OrderItem> items = orderItemMapper.selectByOrderId(orderId);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("order", order);
+        result.put("items", items);
+        return Result.success(result);
+    }
+
+    @Override
+    public Result<?> getMerchantOrders(Long merchantId, int page, int size) {
+        PageHelper.startPage(page, size);
+        List<Order> orders = orderMapper.selectByMerchantId(merchantId);
+        PageInfo<Order> pageInfo = new PageInfo<>(orders);
+        PageDTO<Order> pageDTO = PageDTO.of(pageInfo.getList(), pageInfo.getTotal(), page, size);
+        return Result.success(pageDTO);
+    }
+
+    @Override
+    public Result<?> listAllOrders(int page, int size, String status) {
+        PageHelper.startPage(page, size);
+        List<Order> orders = orderMapper.selectAll(status);
+        PageInfo<Order> pageInfo = new PageInfo<>(orders);
+        PageDTO<Order> pageDTO = PageDTO.of(pageInfo.getList(), pageInfo.getTotal(), page, size);
+        return Result.success(pageDTO);
+    }
+
+    @Override
+    public Result<?> updateOrderStatus(Long orderId, String newStatus) {
+        if (!VALID_STATUSES.contains(newStatus)) {
+            return Result.fail(ResultCode.BAD_REQUEST.getCode(), "无效的订单状态: " + newStatus);
+        }
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        }
+        String currentStatus = order.getStatus();
+        Set<String> allowed = ALLOWED_TRANSITIONS.getOrDefault(currentStatus, Set.of());
+        if (!allowed.contains(newStatus)) {
+            throw new BusinessException(ResultCode.ORDER_STATUS_ERROR);
+        }
+        orderMapper.updateStatus(orderId, newStatus);
+        return Result.success();
+    }
+
+    @Override
+    public Result<?> cancelOrder(Long orderId, Long userId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        }
+        if (!order.getUserId().equals(userId)) {
+            return Result.fail(ResultCode.FORBIDDEN);
+        }
+        if (!"PENDING".equals(order.getStatus())) {
+            throw new BusinessException(ResultCode.ORDER_STATUS_ERROR);
+        }
+        orderMapper.updateStatus(orderId, "CANCELLED");
+        return Result.success();
+    }
+}

@@ -1,0 +1,35 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: techmall-product-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/techmall_product?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+techmall:
+  upload:
+    path: E:/techmall/uploads
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.techmall.product.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.techmall.product.mapper: debug

@@ -31,10 +31,12 @@ CREATE TABLE t_order_item (
     id              BIGINT         NOT NULL AUTO_INCREMENT COMMENT '主键',
     order_id        BIGINT         NOT NULL COMMENT '订单ID',
     product_id      BIGINT         NOT NULL COMMENT '商品ID',
+    merchant_id     BIGINT         NOT NULL COMMENT '商家ID(冗余，避免跨库JOIN)',
     product_name    VARCHAR(200)   NOT NULL COMMENT '商品名称(快照)',
     product_price   DECIMAL(10,2)  NOT NULL COMMENT '商品单价(快照)',
     quantity        INT            NOT NULL COMMENT '数量',
     amount          DECIMAL(10,2)  NOT NULL COMMENT '小计',
     PRIMARY KEY (id),
-    KEY idx_order_id (order_id)
+    KEY idx_order_id (order_id),
+    KEY idx_merchant_id (merchant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单项表';
