@@ -158,20 +158,6 @@ async function loadData() {
 onMounted(loadData)
 onUnmounted(() => clearInterval(timer))
 </script>
-  const dealIds = [8, 6]
-  deals.value = all
-    .filter((p: any) => dealIds.includes(p.id))
-    .map((p: any) => ({
-      ...p,
-      tag: p.id === 8 ? '⚡ 闪购' : '🎯 今日特价',
-      oldPrice: p.id === 8 ? 1999 : p.id === 6 ? 3299 : undefined,
-      icon: p.name.includes('耳机') ? '🎧' : '📦',
-      desc: p.description?.split('+').slice(0, 2).join('·') || '',
-    }))
-}
-
-onMounted(loadData)
-</script>
 
 <style scoped>
 .hero-banner {
