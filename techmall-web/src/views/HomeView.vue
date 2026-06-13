@@ -5,23 +5,27 @@
     <!-- Hero Banner Carousel -->
     <section class="page-container" style="margin-top: var(--space-xl)">
       <div class="hero-banner" v-if="slides.length">
-        <div class="hero-content" :key="current">
-          <div class="hero-tag">{{ slides[current].tag }}</div>
-          <h1>{{ slides[current].title }}<span class="highlight">{{ slides[current].highlight }}</span></h1>
-          <p class="hero-desc">{{ slides[current].desc }}</p>
-          <div class="hero-actions">
-            <router-link :to="`/product/${slides[current].productId}`" class="btn-primary">立即选购 →</router-link>
-            <router-link to="/products" class="btn-ghost">了解更多</router-link>
+        <Transition name="slide-fade" mode="out-in">
+          <div class="hero-content" :key="current">
+            <div class="hero-tag">{{ slides[current].tag }}</div>
+            <h1>{{ slides[current].title }}<span class="highlight">{{ slides[current].highlight }}</span></h1>
+            <p class="hero-desc">{{ slides[current].desc }}</p>
+            <div class="hero-actions">
+              <router-link :to="`/product/${slides[current].productId}`" class="btn-primary">立即选购 →</router-link>
+              <router-link to="/products" class="btn-ghost">了解更多</router-link>
+            </div>
           </div>
-        </div>
-        <div class="hero-visual" :key="'v'+current">
-          <div class="hero-showcase" @click="$router.push(`/product/${slides[current].productId}`)">
-            <div class="product-icon">{{ slides[current].icon }}</div>
-            <div class="spec-line">{{ slides[current].spec1 }}</div>
-            <div class="spec-line">{{ slides[current].spec2 }}</div>
-            <div class="price-tag">¥{{ slides[current].price?.toLocaleString() }}</div>
+        </Transition>
+        <Transition name="slide-fade" mode="out-in">
+          <div class="hero-visual" :key="'v'+current">
+            <div class="hero-showcase" @click="$router.push(`/product/${slides[current].productId}`)">
+              <div class="product-icon">{{ slides[current].icon }}</div>
+              <div class="spec-line">{{ slides[current].spec1 }}</div>
+              <div class="spec-line">{{ slides[current].spec2 }}</div>
+              <div class="price-tag">¥{{ slides[current].price?.toLocaleString() }}</div>
+            </div>
           </div>
-        </div>
+        </Transition>
       </div>
       <div class="hero-dots">
         <span v-for="(_s, i) in slides" :key="i" :class="{ active: i === current }" @click="goToSlide(i)"></span>
@@ -169,13 +173,23 @@ onUnmounted(() => clearInterval(timer))
 .hero-content {
   padding: var(--space-3xl) var(--space-2xl); display: flex;
   flex-direction: column; justify-content: center;
-  animation: fadeIn 0.5s ease;
 }
-.hero-visual { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.5s ease; }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+.hero-visual { display: flex; align-items: center; justify-content: center; }
+/* Vue Transition */
+.slide-fade-enter-active { transition: all 0.6s ease-out; }
+.slide-fade-leave-active { transition: all 0.3s ease-in; }
+.slide-fade-enter-from  { opacity: 0; transform: translateY(12px); }
+.slide-fade-leave-to    { opacity: 0; transform: translateY(-12px); }
+
+/* Hero dots */
+.hero-dots { display: flex; justify-content: center; gap: 8px; margin-top: var(--space-lg); }
+.hero-dots span {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--bg-elevated); cursor: pointer;
+  transition: all var(--duration-fast);
 }
+.hero-dots span.active { background: var(--accent-cyan); box-shadow: 0 0 8px rgba(0,198,242,0.5); width: 24px; border-radius: 4px; }
+.hero-dots span:hover:not(.active) { background: var(--text-muted); }
 .hero-tag {
   font-family: var(--font-display); font-weight: 600; font-size: 0.75rem;
   letter-spacing: 0.15em; color: var(--accent-cyan);
@@ -206,6 +220,7 @@ onUnmounted(() => clearInterval(timer))
   border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   transition: transform var(--duration-normal) var(--ease-smooth);
+  cursor: pointer;
 }
 .hero-visual:hover .hero-showcase { transform: scale(1.03); }
 .product-icon { font-size: 4rem; }
