@@ -2,6 +2,8 @@
   <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)" v-if="product">
+      <router-link to="/home" class="back-link">← 返回首页</router-link>
+      <router-link to="/products" class="back-link" style="margin-left:var(--space-md)">← 返回商品列表</router-link>
       <div class="detail-layout">
         <div class="detail-img"><span style="font-size:6rem">{{ icon }}</span></div>
         <div class="detail-info">
@@ -80,6 +82,12 @@ onMounted(fetch)
 </script>
 
 <style scoped>
+.back-link {
+  display: inline-block; color: var(--text-muted); font-size: 0.85rem;
+  text-decoration: none; margin-bottom: var(--space-lg);
+  transition: color var(--duration-fast);
+}
+.back-link:hover { color: var(--accent-cyan); }
 .detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3xl); }
 .detail-img {
   background: linear-gradient(145deg, #141e2e, #0f172a);

@@ -37,6 +37,14 @@ a:hover { opacity: 0.85; }
 .glass { background: var(--bg-glass); backdrop-filter: blur(20px) saturate(180%); }
 .card  { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
 
+/* 返回链接 */
+.back-link {
+  display: inline-block; color: var(--text-muted); font-size: 0.85rem;
+  text-decoration: none; margin-bottom: var(--space-sm);
+  transition: color var(--duration-fast);
+}
+.back-link:hover { color: var(--accent-cyan); }
+
 /* 页面容器 */
-.page-container { max-width: 1320px; margin: 0 auto; padding: 0 var(--space-lg); }
+.page-container { max-width: 1320px; margin: 0 auto; padding: 0 var(--space-lg) var(--space-3xl); }
 .section-title { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; margin-bottom: var(--space-lg); }

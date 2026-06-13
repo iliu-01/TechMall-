@@ -2,7 +2,8 @@
   <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)">
-      <el-input v-model="keyword" placeholder="搜索商品…" size="large" @keyup.enter="search" style="max-width:420px;margin-bottom:var(--space-lg)" />
+      <router-link to="/home" class="back-link">← 返回首页</router-link>
+      <el-input v-model="keyword" placeholder="搜索商品…" size="large" @keyup.enter="search" style="max-width:420px;margin-bottom:var(--space-lg);margin-top:var(--space-md)" />
       <div class="product-grid" v-if="products.length">
         <ProductCard v-for="p in products" :key="p.id" :product="p" />
       </div>
