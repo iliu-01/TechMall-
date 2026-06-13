@@ -160,7 +160,14 @@ async function loadData() {
   startTimer()
 }
 
-onMounted(loadData)
+onMounted(() => {
+  loadData()
+  // 恢复滚动位置——绕过 router scrollBehavior，直接 DOM 操作更可靠
+  const saved = sessionStorage.getItem('homeScrollY')
+  if (saved) {
+    window.scrollTo(0, Number(saved))
+  }
+})
 onUnmounted(() => clearInterval(timer))
 
 // 离开首页时保存滚动位置
