@@ -45,9 +45,10 @@
         <h2 class="section-title">✨ 新品速递</h2>
         <router-link to="/products" class="section-link">查看全部 →</router-link>
       </div>
-      <div class="product-grid">
+      <div class="product-grid" v-if="newProducts.length">
         <ProductCard v-for="(p, i) in newProducts" :key="p.id" :product="p" :tag="i === 0 ? 'new' : i === 1 ? 'hot' : ''" />
       </div>
+      <el-skeleton v-else :rows="2" animated />
     </section>
 
     <!-- Hot Deals -->
@@ -56,17 +57,18 @@
         <h2 class="section-title">🔥 限时抢购</h2>
         <router-link to="/products" class="section-link">更多超值 →</router-link>
       </div>
-      <div class="deal-row">
-        <div class="deal-card" v-for="d in deals" :key="d.name">
+      <div class="deal-row" v-if="deals.length">
+        <div class="deal-card" v-for="d in deals" :key="d.id" @click="$router.push(`/product/${d.id}`)">
           <div class="deal-visual">{{ d.icon }}</div>
           <div class="deal-info">
             <div class="deal-tag">{{ d.tag }}</div>
             <h3>{{ d.name }}</h3>
             <p class="deal-desc">{{ d.desc }}</p>
-            <div class="deal-price">¥{{ d.price }} <span class="old">¥{{ d.oldPrice }}</span></div>
+            <div class="deal-price">¥{{ d.price?.toLocaleString() }} <span class="old" v-if="d.oldPrice">¥{{ d.oldPrice?.toLocaleString() }}</span></div>
           </div>
         </div>
       </div>
+      <el-skeleton v-else :rows="2" animated />
     </section>
 
     <CartDrawer :visible="showCart" @close="showCart = false" />
@@ -74,7 +76,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
@@ -90,21 +93,29 @@ const categories = [
   { id: 6, name: '配件', icon: '🔌' },
 ]
 
-const newProducts = [
-  { id: 1, name: '小米 16 Ultra 徕卡影像旗舰 5G 智能手机', price: 6999, description: '骁龙 8 Gen5 + 200MP 徕卡四摄 + 120W 快充' },
-  { id: 2, name: 'ROG 幻16 Air 锐龙AI版 轻薄游戏本', price: 14999, description: 'Ryzen AI 9 + RTX 5070 + 2.5K 240Hz OLED' },
-  { id: 3, name: 'Sony WH-1000XM7 头戴式无线降噪耳机', price: 2899, description: '降噪芯片 V3 + 50h 续航 + LDAC 高清传输' },
-  { id: 4, name: 'HUAWEI Watch GT6 Pro 钛金属版', price: 2488, description: 'AMOLED + 14天续航 + IP68' },
-  { id: 5, name: 'iPad Pro M4 芯片 13英寸', price: 11499, description: 'M4芯片 + 13″ XDR + 1TB' },
-  { id: 6, name: 'Odyssey G9 57″ Dual 4K 曲面电竞显示器', price: 15999, description: 'Dual 4K + 240Hz + Mini LED' },
-  { id: 7, name: 'MX Mechanical Mini 无线机械键盘', price: 849, description: '茶轴 + 双模 + Type-C' },
-  { id: 8, name: 'Galaxy S26 Ultra AI 智能手机', price: 9699, description: 'SD 8 Gen5 + 200MP + S Pen' },
-]
+const newProducts = ref<any[]>([])
+const deals = ref<any[]>([])
 
-const deals = [
-  { name: 'AirPods Pro 3 主动降噪', desc: 'H3 芯片 · 自适应音频 · USB-C', price: 1699, oldPrice: 1999, icon: '🎧', tag: '⚡ 闪购' },
-  { name: 'Apple Watch Ultra 3 高山回环', desc: '49mm 钛金属 · 精确双频 GPS · 100m 防水', price: 5299, oldPrice: 6499, icon: '⌚', tag: '🎯 今日特价' },
-]
+async function loadData() {
+  // 从 API 获取真实商品数据
+  const res: any = await request.get('/product/list', { params: { page: 1, size: 8 } })
+  const all: any[] = res.data?.records || []
+  newProducts.value = all
+
+  // 用 ID=8 (AirPods Pro 3) 和 ID=6 (Sony WH-1000XM7) 作为限时抢购
+  const dealIds = [8, 6]
+  deals.value = all
+    .filter((p: any) => dealIds.includes(p.id))
+    .map((p: any) => ({
+      ...p,
+      tag: p.id === 8 ? '⚡ 闪购' : '🎯 今日特价',
+      oldPrice: p.id === 8 ? 1999 : p.id === 6 ? 3299 : undefined,
+      icon: p.name.includes('耳机') ? '🎧' : '📦',
+      desc: p.description?.split('+').slice(0, 2).join('·') || '',
+    }))
+}
+
+onMounted(loadData)
 </script>
 
 <style scoped>
