@@ -140,7 +140,13 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <!-- 子模块通过各自的 pom.xml 单独声明 spring-boot-maven-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
