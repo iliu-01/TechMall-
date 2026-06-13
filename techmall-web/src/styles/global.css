@@ -45,6 +45,38 @@ a:hover { opacity: 0.85; }
 }
 .back-link:hover { color: var(--accent-cyan); }
 
+/* 统一表格样式 */
+.table-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.table-wrap .el-table {
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: transparent;
+  --el-table-row-hover-bg-color: rgba(0, 198, 242, 0.04);
+  --el-table-border-color: var(--border-subtle);
+  --el-table-text-color: var(--text-primary);
+}
+.table-wrap .el-table__header th {
+  background: var(--bg-elevated) !important;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(0, 198, 242, 0.15) !important;
+}
+.table-wrap .el-table__body tr:hover td {
+  background: rgba(0, 198, 242, 0.04) !important;
+}
+.table-wrap .el-loading-mask { background: rgba(11, 17, 30, 0.7); }
+.price-cell { font-family: var(--font-display); font-weight: 600; color: var(--accent-amber); }
+.status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; margin-top: -1px; }
+.status-dot.on  { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.4); }
+.status-dot.off { background: var(--text-muted); }
+
 /* 页面容器 */
 .page-container { max-width: 1320px; margin: 0 auto; padding: 0 var(--space-lg) var(--space-3xl); }
 .section-title { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; margin-bottom: var(--space-lg); }

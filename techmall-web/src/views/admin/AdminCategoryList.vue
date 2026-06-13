@@ -5,12 +5,14 @@
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
         <h2 class="section-title" style="margin-bottom:0">📂 分类管理</h2>
       </div>
-      <el-table :data="cats" v-loading="loading" stripe style="width:100%;background:var(--bg-surface)">
+        <div class="table-wrap">
+        <el-table :data="cats" v-loading="loading">
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="name" label="名称" />
         <el-table-column prop="parentId" label="父级ID" width="80" />
         <el-table-column prop="sort" label="排序" width="80" />
       </el-table>
+      </div>
       <el-card style="margin-top:var(--space-lg);background:var(--bg-surface);border-color:var(--border-subtle)">
         <el-form :model="form" inline>
           <el-form-item label="名称"><el-input v-model="form.name" /></el-form-item>

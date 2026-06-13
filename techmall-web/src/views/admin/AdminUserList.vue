@@ -3,7 +3,8 @@
     <AppHeader />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <h2 class="section-title">👥 用户管理</h2>
-      <el-table :data="users" v-loading="loading" stripe style="width:100%;background:var(--bg-surface)">
+        <div class="table-wrap">
+        <el-table :data="users" v-loading="loading">
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="username" label="用户名" width="120" />
         <el-table-column prop="nickname" label="昵称" width="120" />
@@ -15,6 +16,7 @@
           </template>
         </el-table-column>
       </el-table>
+      </div>
     </div>
   </div>
 </template>

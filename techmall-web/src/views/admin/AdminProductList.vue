@@ -3,7 +3,8 @@
     <AppHeader />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <h2 class="section-title">📦 全站商品管理</h2>
-      <el-table :data="products" v-loading="loading" stripe style="width:100%;background:var(--bg-surface)">
+        <div class="table-wrap">
+        <el-table :data="products" v-loading="loading">
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="name" label="名称" min-width="200" />
         <el-table-column prop="price" label="价格" width="100"><template #default="{row}">¥{{ row.price }}</template></el-table-column>
@@ -16,6 +17,7 @@
           </template>
         </el-table-column>
       </el-table>
+      </div>
     </div>
   </div>
 </template>

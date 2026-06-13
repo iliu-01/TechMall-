@@ -10,12 +10,14 @@
         <p>总额: <span style="color:var(--accent-amber);font-weight:700;font-size:1.2rem">¥{{ detail.order.totalAmount }}</span></p>
       </el-card>
       <h3>商品明细</h3>
-      <el-table :data="detail.items" style="width:100%;background:var(--bg-surface);margin-top:var(--space-md)">
+        <div class="table-wrap">
+        <el-table :data="detail.items" style="margin-top:var(--space-md)">
         <el-table-column prop="productName" label="商品" />
         <el-table-column prop="productPrice" label="单价"><template #default="{row}">¥{{ row.productPrice }}</template></el-table-column>
         <el-table-column prop="quantity" label="数量" width="100" />
         <el-table-column prop="amount" label="小计"><template #default="{row}">¥{{ row.amount }}</template></el-table-column>
       </el-table>
+      </div>
     </div>
     <CartDrawer :visible="showCart" @close="showCart = false" />
   </div>
