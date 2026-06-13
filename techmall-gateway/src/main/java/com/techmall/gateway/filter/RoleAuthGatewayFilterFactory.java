@@ -16,9 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
-public class RoleAuthFilter extends AbstractGatewayFilterFactory<RoleAuthFilter.Config> {
+public class RoleAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<RoleAuthGatewayFilterFactory.Config> {
 
-    public RoleAuthFilter() {
+    public RoleAuthGatewayFilterFactory() {
         super(Config.class);
     }
 

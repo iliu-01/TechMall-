@@ -32,7 +32,7 @@ router.beforeEach((to, _from, next) => {
     return next()
   }
   if (!userStore.isLoggedIn) {
-    return next('/login')
+    return next({ path: '/login', query: { redirect: to.fullPath } })
   }
   const requiredRoles = to.meta?.roles as string[] | undefined
   if (requiredRoles && !requiredRoles.includes(userStore.role)) {

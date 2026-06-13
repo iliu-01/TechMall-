@@ -32,7 +32,7 @@ import AppHeader from '@/components/AppHeader.vue'
 const orders = ref<any[]>([])
 const loading = ref(false)
 
-function statusType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : 'success' }
+function statusType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : s === 'COMPLETED' ? 'success' : 'danger' }
 
 async function fetch() {
   loading.value = true

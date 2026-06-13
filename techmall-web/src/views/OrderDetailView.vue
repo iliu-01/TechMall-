@@ -32,7 +32,7 @@ const route = useRoute()
 const showCart = ref(false)
 const detail = ref<any>(null)
 
-function statusType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : 'success' }
+function statusType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : s === 'COMPLETED' ? 'success' : 'danger' }
 
 onMounted(async () => {
   const id = route.params.id

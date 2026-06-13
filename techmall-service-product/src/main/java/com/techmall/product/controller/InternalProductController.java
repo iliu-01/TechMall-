@@ -44,12 +44,12 @@ public class InternalProductController {
         if (product == null) {
             throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND);
         }
-        if (product.getStock() < quantity) {
+
+        // 原子扣减：UPDATE ... WHERE stock >= quantity，检查影响行数
+        int affected = productMapper.updateStock(id, quantity);
+        if (affected == 0) {
             throw new BusinessException(ResultCode.STOCK_INSUFFICIENT);
         }
-
-        int newStock = product.getStock() - quantity;
-        productMapper.updateStock(id, newStock);
         return Result.success();
     }
 }

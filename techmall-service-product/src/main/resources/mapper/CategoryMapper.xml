@@ -26,7 +26,7 @@
     <insert id="insert" parameterType="com.techmall.product.entity.Category"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO t_category (name, parent_id, sort, created_at)
-        VALUES (#{name}, #{parentId}, #{sort}, #{createdAt})
+        VALUES (#{name}, #{parentId}, #{sort}, NOW())
     </insert>
 
 </mapper>

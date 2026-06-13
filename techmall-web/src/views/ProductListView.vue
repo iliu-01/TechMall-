@@ -23,10 +23,14 @@ import CartDrawer from '@/components/CartDrawer.vue'
 const route = useRoute()
 const showCart = ref(false)
 const keyword = ref((route.query.keyword as string) || '')
+const categoryId = ref(route.query.categoryId ? Number(route.query.categoryId) : undefined)
 const products = ref<any[]>([])
 
 async function search() {
-  const res: any = await request.get('/product/list', { params: { keyword: keyword.value, page: 1, size: 20 } })
+  const params: any = { page: 1, size: 20 }
+  if (keyword.value) params.keyword = keyword.value
+  if (categoryId.value) params.categoryId = categoryId.value
+  const res: any = await request.get('/product/list', { params })
   products.value = res.data?.records || []
 }
 

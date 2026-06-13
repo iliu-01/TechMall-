@@ -44,12 +44,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @SentinelResource(value = "createOrder", fallback = "createOrderFallback")
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Result<?> createOrder(CreateOrderDTO dto, Long userId) {
+        // 校验 items 非空
+        if (dto.getItems() == null || dto.getItems().isEmpty()) {
+            throw new BusinessException(400, "订单商品不能为空");
+        }
+
         // 1. 遍历 items，逐个调用 productFeignClient.getProduct() 获取价格
         BigDecimal total = BigDecimal.ZERO;
         List<OrderItem> items = new ArrayList<>();
         for (OrderItemDTO item : dto.getItems()) {
+            if (item.getQuantity() == null || item.getQuantity() <= 0) {
+                throw new BusinessException(400, "商品数量必须大于0");
+            }
             Result<?> pr = productFeignClient.getProduct(item.getProductId());
             if (pr.getCode() != 200) {
                 throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND);
@@ -58,7 +66,11 @@ public class OrderServiceImpl implements OrderService {
             Map<String, Object> pd = (Map<String, Object>) pr.getData();
             String name = (String) pd.get("name");
             BigDecimal price = new BigDecimal(pd.get("price").toString());
-            // 从商品数据中获取 merchantId，存入订单项(冗余，避免跨库JOIN)
+            Integer productStock = pd.get("stock") != null
+                    ? Integer.valueOf(pd.get("stock").toString()) : 0;
+            if (productStock < item.getQuantity()) {
+                throw new BusinessException(ResultCode.STOCK_INSUFFICIENT);
+            }
             Long merchantId = pd.get("merchantId") != null
                     ? Long.valueOf(pd.get("merchantId").toString()) : 0L;
 
@@ -82,19 +94,22 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverPhone(dto.getReceiverPhone());
         order.setReceiverAddr(dto.getReceiverAddr());
         orderMapper.insert(order);
-        // 3. 保存订单项 + 扣库存
+        // 3. 保存订单项 + 扣库存（检查扣减结果）
         for (OrderItem oi : items) {
             oi.setOrderId(order.getId());
             orderItemMapper.insert(oi);
             Map<String, Integer> stockBody = new HashMap<>();
             stockBody.put("quantity", oi.getQuantity());
-            productFeignClient.deductStock(oi.getProductId(), stockBody);
+            Result<?> stockResult = productFeignClient.deductStock(oi.getProductId(), stockBody);
+            if (stockResult.getCode() != 200) {
+                throw new BusinessException(ResultCode.STOCK_INSUFFICIENT);
+            }
         }
         return Result.success(order);
     }
 
     public Result<?> createOrderFallback(CreateOrderDTO dto, Long userId, Throwable t) {
-        log.error("createOrder fallback triggered, userId={}, error={}", userId, t.getMessage());
+        log.error("createOrder fallback triggered, userId={}, error={}", userId, t != null ? t.toString() : "unknown");
         return Result.fail(ResultCode.SERVICE_BUSY);
     }
 

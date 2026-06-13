@@ -69,8 +69,8 @@
     </update>
 
     <update id="updateStock">
-        UPDATE t_product SET stock = #{stock}, updated_at = NOW()
-        WHERE id = #{id}
+        UPDATE t_product SET stock = stock - #{quantity}, updated_at = NOW()
+        WHERE id = #{id} AND stock >= #{quantity}
     </update>
 
     <delete id="deleteById">

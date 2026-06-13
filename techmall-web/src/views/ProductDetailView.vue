@@ -12,11 +12,13 @@
           </div>
           <div class="detail-price">¥{{ product.price }}</div>
           <div style="color:var(--text-muted);margin-bottom:var(--space-xl)">
-            库存: {{ product.stock || 0 }} 件 | 商家ID: {{ product.merchantId }}
+            库存: {{ product.stock ?? 0 }} 件 | 商家ID: {{ product.merchantId }}
           </div>
           <div class="detail-actions">
-            <el-input-number v-model="qty" :min="1" :max="product.stock || 1" size="large" />
-            <el-button type="primary" size="large" @click="addToCart" style="border-radius:24px">加入购物车</el-button>
+            <el-input-number v-model="qty" :min="1" :max="Math.max(product.stock ?? 0, 1)" :disabled="(product.stock ?? 0) === 0" size="large" />
+            <el-button type="primary" size="large" @click="addToCart" style="border-radius:24px" :disabled="(product.stock ?? 0) === 0">
+              {{ (product.stock ?? 0) === 0 ? '已售罄' : '加入购物车' }}
+            </el-button>
           </div>
         </div>
       </div>

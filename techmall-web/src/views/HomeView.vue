@@ -91,19 +91,19 @@ const categories = [
 ]
 
 const newProducts = [
-  { id: 1, name: '小米 16 Ultra 徕卡影像旗舰 5G 智能手机', price: '6,999', description: '骁龙 8 Gen5 + 200MP 徕卡四摄 + 120W 快充' },
-  { id: 2, name: 'ROG 幻16 Air 锐龙AI版 轻薄游戏本', price: '14,999', description: 'Ryzen AI 9 + RTX 5070 + 2.5K 240Hz OLED' },
-  { id: 3, name: 'Sony WH-1000XM7 头戴式无线降噪耳机', price: '2,899', description: '降噪芯片 V3 + 50h 续航 + LDAC 高清传输' },
-  { id: 4, name: 'HUAWEI Watch GT6 Pro 钛金属版', price: '2,488', description: 'AMOLED + 14天续航 + IP68' },
-  { id: 5, name: 'iPad Pro M4 芯片 13英寸', price: '11,499', description: 'M4芯片 + 13″ XDR + 1TB' },
-  { id: 6, name: 'Odyssey G9 57″ Dual 4K 曲面电竞显示器', price: '15,999', description: 'Dual 4K + 240Hz + Mini LED' },
-  { id: 7, name: 'MX Mechanical Mini 无线机械键盘', price: '849', description: '茶轴 + 双模 + Type-C' },
-  { id: 8, name: 'Galaxy S26 Ultra AI 智能手机', price: '9,699', description: 'SD 8 Gen5 + 200MP + S Pen' },
+  { id: 1, name: '小米 16 Ultra 徕卡影像旗舰 5G 智能手机', price: 6999, description: '骁龙 8 Gen5 + 200MP 徕卡四摄 + 120W 快充' },
+  { id: 2, name: 'ROG 幻16 Air 锐龙AI版 轻薄游戏本', price: 14999, description: 'Ryzen AI 9 + RTX 5070 + 2.5K 240Hz OLED' },
+  { id: 3, name: 'Sony WH-1000XM7 头戴式无线降噪耳机', price: 2899, description: '降噪芯片 V3 + 50h 续航 + LDAC 高清传输' },
+  { id: 4, name: 'HUAWEI Watch GT6 Pro 钛金属版', price: 2488, description: 'AMOLED + 14天续航 + IP68' },
+  { id: 5, name: 'iPad Pro M4 芯片 13英寸', price: 11499, description: 'M4芯片 + 13″ XDR + 1TB' },
+  { id: 6, name: 'Odyssey G9 57″ Dual 4K 曲面电竞显示器', price: 15999, description: 'Dual 4K + 240Hz + Mini LED' },
+  { id: 7, name: 'MX Mechanical Mini 无线机械键盘', price: 849, description: '茶轴 + 双模 + Type-C' },
+  { id: 8, name: 'Galaxy S26 Ultra AI 智能手机', price: 9699, description: 'SD 8 Gen5 + 200MP + S Pen' },
 ]
 
 const deals = [
-  { name: 'AirPods Pro 3 主动降噪', desc: 'H3 芯片 · 自适应音频 · USB-C', price: '1,699', oldPrice: '1,999', icon: '🎧', tag: '⚡ 闪购' },
-  { name: 'Apple Watch Ultra 3 高山回环', desc: '49mm 钛金属 · 精确双频 GPS · 100m 防水', price: '5,299', oldPrice: '6,499', icon: '⌚', tag: '🎯 今日特价' },
+  { name: 'AirPods Pro 3 主动降噪', desc: 'H3 芯片 · 自适应音频 · USB-C', price: 1699, oldPrice: 1999, icon: '🎧', tag: '⚡ 闪购' },
+  { name: 'Apple Watch Ultra 3 高山回环', desc: '49mm 钛金属 · 精确双频 GPS · 100m 防水', price: 5299, oldPrice: 6499, icon: '⌚', tag: '🎯 今日特价' },
 ]
 </script>
 

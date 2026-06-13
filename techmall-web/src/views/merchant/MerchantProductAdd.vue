@@ -35,6 +35,8 @@ const cats = ref<any[]>([])
 const form = reactive({ name: '', description: '', price: 0, stock: 0, categoryId: null })
 
 async function submit() {
+  if (!form.name.trim()) { ElMessage.warning('请输入商品名称'); return }
+  if (!form.categoryId) { ElMessage.warning('请选择分类'); return }
   submitting.value = true
   try {
     await request.post('/product', { ...form })
