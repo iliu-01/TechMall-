@@ -13,8 +13,8 @@ import java.util.Map;
 @FeignClient(name = "techmall-product-service", fallbackFactory = ProductFeignFallbackFactory.class)
 public interface ProductFeignClient {
     @GetMapping("/internal/product/{id}")
-    Result<?> getProduct(@PathVariable Long id);
+    Result<?> getProduct(@PathVariable("id") Long id);
 
     @PutMapping("/internal/product/{id}/stock")
-    Result<?> deductStock(@PathVariable Long id, @RequestBody Map<String, Integer> body);
+    Result<?> deductStock(@PathVariable("id") Long id, @RequestBody Map<String, Integer> body);
 }

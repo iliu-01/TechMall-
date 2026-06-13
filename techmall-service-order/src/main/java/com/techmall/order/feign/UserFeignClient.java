@@ -9,5 +9,5 @@ import com.techmall.order.feign.fallback.UserFeignFallbackFactory;
 @FeignClient(name = "techmall-user-service", fallbackFactory = UserFeignFallbackFactory.class)
 public interface UserFeignClient {
     @GetMapping("/internal/user/{id}")
-    Result<?> getUserById(@PathVariable Long id);
+    Result<?> getUserById(@PathVariable("id") Long id);
 }
