@@ -6,6 +6,7 @@ spring:
     name: techmall-gateway
   cloud:
     nacos:
+      server-addr: localhost:8848
       discovery:
         server-addr: localhost:8848
     gateway:
