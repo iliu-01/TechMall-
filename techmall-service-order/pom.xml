@@ -1,0 +1,1 @@
+<project><modelVersion>4.0.0</modelVersion><parent><groupId>com.techmall</groupId><artifactId>techmall</artifactId><version>1.0.0</version></parent><artifactId>techmall-service-order</artifactId></project>
