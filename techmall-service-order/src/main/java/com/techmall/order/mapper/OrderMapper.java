@@ -15,7 +15,7 @@ public interface OrderMapper {
 
     List<Order> selectByMerchantId(@Param("merchantId") Long merchantId);
 
-    List<Order> selectAll(@Param("status") String status);
+    List<Order> selectAll(@Param("userId") Long userId, @Param("status") String status);
 
     int updateStatus(@Param("id") Long id, @Param("status") String status);
 }

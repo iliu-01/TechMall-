@@ -43,8 +43,9 @@ public class OrderController {
     @GetMapping("/list")
     public Result<?> listAllOrders(@RequestParam(name = "page", defaultValue = "1") int page,
                                    @RequestParam(name = "size", defaultValue = "10") int size,
-                                   @RequestParam(name = "status", required = false) String status) {
-        return orderService.listAllOrders(page, size, status);
+                                   @RequestParam(name = "status", required = false) String status,
+                                   @RequestParam(name = "userId", required = false) Long userId) {
+        return orderService.listAllOrders(page, size, status, userId);
     }
 
     @PutMapping("/{id}/status")

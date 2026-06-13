@@ -32,10 +32,15 @@
             <if test="categoryId != null">
                 AND category_id = #{categoryId}
             </if>
+            <if test="merchantId != null">
+                AND merchant_id = #{merchantId}
+            </if>
             <if test="keyword != null and keyword != ''">
                 AND name LIKE CONCAT('%', #{keyword}, '%')
             </if>
-            AND status = 1
+            <if test="includeOffShelf == null or !includeOffShelf">
+                AND status = 1
+            </if>
         </where>
         ORDER BY created_at DESC
     </select>

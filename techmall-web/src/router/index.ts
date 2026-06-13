@@ -22,6 +22,8 @@ const router = createRouter({
     { path: '/admin/products', name: 'AdminProducts', component: () => import('@/views/admin/AdminProductList.vue'), meta: { roles: ['ADMIN'] } },
     { path: '/admin/categories', name: 'AdminCategories', component: () => import('@/views/admin/AdminCategoryList.vue'), meta: { roles: ['ADMIN'] } },
     { path: '/admin/orders', name: 'AdminOrders', component: () => import('@/views/admin/AdminOrderList.vue'), meta: { roles: ['ADMIN'] } },
+    { path: '/admin/user-orders', name: 'AdminUserOrders', component: () => import('@/views/admin/AdminUserOrders.vue'), meta: { roles: ['ADMIN'] } },
+    { path: '/admin/user-products', name: 'AdminUserProducts', component: () => import('@/views/admin/AdminUserProducts.vue'), meta: { roles: ['ADMIN'] } },
     { path: '/', redirect: '/home' },
     { path: '/:pathMatch(.*)*', redirect: '/home' },
   ],

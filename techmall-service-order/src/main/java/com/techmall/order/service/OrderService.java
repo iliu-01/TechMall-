@@ -12,7 +12,7 @@ public interface OrderService {
 
     Result<?> getMerchantOrders(Long merchantId, int page, int size);
 
-    Result<?> listAllOrders(int page, int size, String status);
+    Result<?> listAllOrders(int page, int size, String status, Long userId);
 
     Result<?> updateOrderStatus(Long orderId, String newStatus);
 

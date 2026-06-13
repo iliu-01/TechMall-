@@ -44,6 +44,9 @@
     <select id="selectAll" resultMap="OrderMap">
         SELECT * FROM t_order
         <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
             <if test="status != null and status != ''">
                 AND status = #{status}
             </if>

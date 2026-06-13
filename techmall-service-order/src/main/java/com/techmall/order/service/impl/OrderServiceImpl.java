@@ -145,9 +145,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Result<?> listAllOrders(int page, int size, String status) {
+    public Result<?> listAllOrders(int page, int size, String status, Long userId) {
         PageHelper.startPage(page, size);
-        List<Order> orders = orderMapper.selectAll(status);
+        List<Order> orders = orderMapper.selectAll(userId, status);
         PageInfo<Order> pageInfo = new PageInfo<>(orders);
         PageDTO<Order> pageDTO = PageDTO.of(pageInfo.getList(), pageInfo.getTotal(), page, size);
         return Result.success(pageDTO);

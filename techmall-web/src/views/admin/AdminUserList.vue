@@ -10,9 +10,21 @@
         <el-table-column prop="nickname" label="昵称" width="120" />
         <el-table-column prop="role" label="角色" width="100"><template #default="{row}"><el-tag>{{ row.role }}</el-tag></template></el-table-column>
         <el-table-column prop="status" label="状态" width="80"><template #default="{row}"><el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '正常' : '禁用' }}</el-tag></template></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="管理" width="200" align="center">
           <template #default="{row}">
-            <el-button v-if="row.role !== 'ADMIN'" :type="row.status ? 'warning' : 'success'" size="small" @click="toggle(row)">{{ row.status ? '禁用' : '启用' }}</el-button>
+            <el-button size="small" text type="primary"
+              v-if="row.role === 'USER'"
+              @click="$router.push({path:'/admin/user-orders', query:{userId:row.id, name:row.nickname||row.username}})">
+              订单记录
+            </el-button>
+            <el-button size="small" text type="primary"
+              v-if="row.role === 'MERCHANT'"
+              @click="$router.push({path:'/admin/user-products', query:{merchantId:row.id, name:row.nickname||row.username}})">
+              商品管理
+            </el-button>
+            <el-button v-if="row.role !== 'ADMIN'" :type="row.status ? 'warning' : 'success'" size="small" @click="toggle(row)">
+              {{ row.status ? '禁用' : '启用' }}
+            </el-button>
           </template>
         </el-table-column>
       </el-table>

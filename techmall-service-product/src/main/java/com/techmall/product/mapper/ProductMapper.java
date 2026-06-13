@@ -12,7 +12,9 @@ public interface ProductMapper {
     Product selectById(@Param("id") Long id);
 
     List<Product> selectList(@Param("categoryId") Long categoryId,
-                             @Param("keyword") String keyword);
+                             @Param("keyword") String keyword,
+                             @Param("merchantId") Long merchantId,
+                             @Param("includeOffShelf") Boolean includeOffShelf);
 
     int insert(Product product);
 

@@ -20,9 +20,10 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    public PageDTO<Product> listProducts(Long categoryId, String keyword, int page, int size) {
+    public PageDTO<Product> listProducts(Long categoryId, String keyword, int page, int size,
+                                          Long merchantId, Boolean includeOffShelf) {
         PageHelper.startPage(page, size);
-        List<Product> list = productMapper.selectList(categoryId, keyword);
+        List<Product> list = productMapper.selectList(categoryId, keyword, merchantId, includeOffShelf);
         PageInfo<Product> pageInfo = new PageInfo<>(list);
         return PageDTO.of(list, pageInfo.getTotal(), page, size);
     }

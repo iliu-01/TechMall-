@@ -8,7 +8,7 @@ public interface ProductService {
     /**
      * 分页查询商品列表（公开）
      */
-    PageDTO<Product> listProducts(Long categoryId, String keyword, int page, int size);
+    PageDTO<Product> listProducts(Long categoryId, String keyword, int page, int size, Long merchantId, Boolean includeOffShelf);
 
     /**
      * 根据 ID 获取商品详情（公开）

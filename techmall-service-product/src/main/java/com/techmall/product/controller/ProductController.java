@@ -23,8 +23,10 @@ public class ProductController {
     public Result<PageDTO<Product>> list(@RequestParam(name = "categoryId", required = false) Long categoryId,
                                          @RequestParam(name = "keyword", required = false) String keyword,
                                          @RequestParam(name = "page", defaultValue = "1") int page,
-                                         @RequestParam(name = "size", defaultValue = "10") int size) {
-        return Result.success(productService.listProducts(categoryId, keyword, page, size));
+                                         @RequestParam(name = "size", defaultValue = "10") int size,
+                                         @RequestParam(name = "merchantId", required = false) Long merchantId,
+                                         @RequestParam(name = "includeOffShelf", defaultValue = "false") Boolean includeOffShelf) {
+        return Result.success(productService.listProducts(categoryId, keyword, page, size, merchantId, includeOffShelf));
     }
 
     /**
