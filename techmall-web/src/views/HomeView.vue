@@ -2,26 +2,29 @@
   <div>
     <AppHeader @toggleCart="showCart = true" />
 
-    <!-- Hero Banner -->
+    <!-- Hero Banner Carousel -->
     <section class="page-container" style="margin-top: var(--space-xl)">
-      <div class="hero-banner">
+      <div class="hero-banner" v-if="slides.length">
         <div class="hero-content">
-          <div class="hero-tag">2026 新品首发</div>
-          <h1>重构性能想象的<span class="highlight">次世代</span></h1>
-          <p class="hero-desc">搭载最新旗舰芯片，重新定义移动计算体验。<br/>限时首发价，尊享 12 期免息分期。</p>
+          <div class="hero-tag">{{ slides[current].tag }}</div>
+          <h1>{{ slides[current].title }}<span class="highlight">{{ slides[current].highlight }}</span></h1>
+          <p class="hero-desc">{{ slides[current].desc }}</p>
           <div class="hero-actions">
-            <a href="/products" class="btn-primary">立即选购 →</a>
-            <a href="/products" class="btn-ghost">了解更多</a>
+            <a class="btn-primary" @click="$router.push(`/product/${slides[current].productId}`)">立即选购 →</a>
+            <a class="btn-ghost" @click="$router.push(`/product/${slides[current].productId}`)">了解更多</a>
           </div>
         </div>
-        <div class="hero-visual">
+        <div class="hero-visual" @click="$router.push(`/product/${slides[current].productId}`)">
           <div class="hero-showcase">
-            <div class="product-icon">💻</div>
-            <div class="spec-line">14.2″ · 3.2K · 120Hz</div>
-            <div class="spec-line">M4 Ultra · 32GB · 1TB</div>
-            <div class="price-tag">¥12,999</div>
+            <div class="product-icon">{{ slides[current].icon }}</div>
+            <div class="spec-line">{{ slides[current].spec1 }}</div>
+            <div class="spec-line">{{ slides[current].spec2 }}</div>
+            <div class="price-tag">¥{{ slides[current].price?.toLocaleString() }}</div>
           </div>
         </div>
+      </div>
+      <div class="hero-dots">
+        <span v-for="(_s, i) in slides" :key="i" :class="{ active: i === current }" @click="goToSlide(i)"></span>
       </div>
     </section>
 
@@ -76,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
 import ProductCard from '@/components/ProductCard.vue'
@@ -93,16 +96,68 @@ const categories = [
   { id: 6, name: '配件', icon: '🔌' },
 ]
 
+// 轮播数据（对应数据库真实产品 ID）
+const slides = ref<any[]>([])
+const current = ref(0)
+let timer: any = null
+
+// 4 张轮播图 — 产品 ID 对应数据库真实产品
+const slideDefs = [
+  { productId: 1, icon: '📱', tag: '2026 旗舰首发', title: '徕卡影像', highlight: '新纪元', desc: '200MP 徕卡四摄 · 骁龙 8 Gen5 · 120W 秒充', spec1: '6.73″ · 2K LTPO · 120Hz', spec2: '骁龙 8 Gen5 · 16+512GB' },
+  { productId: 2, icon: '💻', tag: 'AI 超能本', title: '重构性能想象的', highlight: '次世代', desc: 'Ryzen AI 9 + RTX 5070 · 2.5K OLED · 仅 1.5kg', spec1: '16″ · 2.5K · 240Hz OLED', spec2: 'Ryzen AI 9 · RTX 5070 · 32GB' },
+  { productId: 6, icon: '🎧', tag: '降噪新标杆', title: '静享纯粹', highlight: '声学之旅', desc: '集成降噪 V3 · 50h 超长续航 · LDAC 高清无线', spec1: '降噪芯片 V3 · 30mm 驱动', spec2: '50h 续航 · LDAC · 快充' },
+  { productId: 8, icon: '🎧', tag: '今天不抢明天后悔', title: '限时特惠', highlight: '闪购价', desc: 'H3 芯片 · 自适应音频 · USB-C · 精确查找', spec1: 'H3 芯片 · 自适应均衡', spec2: 'USB-C · IPX4 · 精确查找' },
+]
+
+function goToSlide(i: number) {
+  current.value = i
+  resetTimer()
+}
+
+function startTimer() {
+  timer = setInterval(() => {
+    current.value = (current.value + 1) % slides.value.length
+  }, 4000)
+}
+
+function resetTimer() {
+  clearInterval(timer)
+  startTimer()
+}
+
 const newProducts = ref<any[]>([])
 const deals = ref<any[]>([])
 
 async function loadData() {
-  // 从 API 获取真实商品数据
+  // 从 API 获取真实商品，与轮播数据合并价格
   const res: any = await request.get('/product/list', { params: { page: 1, size: 8 } })
   const all: any[] = res.data?.records || []
   newProducts.value = all
 
-  // 用 ID=8 (AirPods Pro 3) 和 ID=6 (Sony WH-1000XM7) 作为限时抢购
+  // 轮播数据绑定真实价格
+  slides.value = slideDefs.map(def => {
+    const dbProduct = all.find((p: any) => p.id === def.productId)
+    return { ...def, price: dbProduct?.price || 0 }
+  })
+
+  // 限时抢购
+  const dealIds = [8, 6]
+  deals.value = all
+    .filter((p: any) => dealIds.includes(p.id))
+    .map((p: any) => ({
+      ...p,
+      tag: p.id === 8 ? '⚡ 闪购' : '🎯 今日特价',
+      oldPrice: p.id === 8 ? 1999 : p.id === 6 ? 3299 : undefined,
+      icon: p.name.includes('耳机') ? '🎧' : '📦',
+      desc: p.description?.split('+').slice(0, 2).join('·') || '',
+    }))
+
+  startTimer()
+}
+
+onMounted(loadData)
+onUnmounted(() => clearInterval(timer))
+</script>
   const dealIds = [8, 6]
   deals.value = all
     .filter((p: any) => dealIds.includes(p.id))
@@ -124,7 +179,7 @@ onMounted(loadData)
   border-radius: var(--radius-xl); overflow: hidden;
   display: grid; grid-template-columns: 1fr 1fr; min-height: 400px;
 }
-.hero-content { padding: var(--space-3xl) var(--space-2xl); display: flex; flex-direction: column; justify-content: center; }
+.hero-content { padding: var(--space-3xl) var(--space-2xl); display: flex; flex-direction: column; justify-content: center; transition: opacity 0.3s ease; }
 .hero-tag {
   font-family: var(--font-display); font-weight: 600; font-size: 0.75rem;
   letter-spacing: 0.15em; color: var(--accent-cyan);
@@ -148,13 +203,15 @@ onMounted(loadData)
 .btn-primary:hover { box-shadow: 0 0 24px rgba(0,198,242,0.35); }
 .btn-ghost { border: 1px solid var(--border-subtle); color: var(--text-primary); }
 .btn-ghost:hover { border-color: var(--text-secondary); background: rgba(255,255,255,0.03); }
-.hero-visual { display: flex; align-items: center; justify-content: center; }
+.hero-visual { display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .hero-showcase {
   width: 280px; height: 280px;
   background: linear-gradient(145deg, #1a2332, #0f172a);
   border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  transition: transform var(--duration-normal) var(--ease-smooth);
 }
+.hero-visual:hover .hero-showcase { transform: scale(1.03); }
 .product-icon { font-size: 4rem; }
 .spec-line { font-family: var(--font-display); font-size: 0.75rem; color: var(--text-muted); }
 .price-tag { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; color: var(--accent-amber); }
