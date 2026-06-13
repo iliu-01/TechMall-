@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: techmall-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://techmall-user-service
+          predicates:
+            - Path=/api/user/**
+        - id: product-service
+          uri: lb://techmall-product-service
+          predicates:
+            - Path=/api/product/**
+        - id: product-upload
+          uri: lb://techmall-product-service
+          predicates:
+            - Path=/api/upload/**
+        - id: category-service
+          uri: lb://techmall-product-service
+          predicates:
+            - Path=/api/category/**
+        - id: order-service
+          uri: lb://techmall-order-service
+          predicates:
+            - Path=/api/order/**
+      default-filters:
+        - RoleAuth
+    sentinel:
+      transport:
+        dashboard: localhost:8858
+      scg:
+        fallback:
+          mode: response
+          response-status: 429
+          response-body: '{"code":429,"message":"请求太频繁","data":null}'
+
+logging:
+  level:
+    com.techmall.gateway: debug
