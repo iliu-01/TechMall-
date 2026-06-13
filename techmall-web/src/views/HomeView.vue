@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
@@ -158,16 +158,16 @@ async function loadData() {
     }))
 
   startTimer()
-}
 
-onMounted(() => {
-  loadData()
-  // 恢复滚动位置——绕过 router scrollBehavior，直接 DOM 操作更可靠
+  // 数据加载后恢复滚动位置
   const saved = sessionStorage.getItem('homeScrollY')
   if (saved) {
+    await nextTick()
     window.scrollTo(0, Number(saved))
   }
-})
+}
+
+onMounted(loadData)
 onUnmounted(() => clearInterval(timer))
 
 // 离开首页时保存滚动位置
