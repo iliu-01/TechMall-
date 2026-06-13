@@ -151,7 +151,7 @@ const deals = [
 .section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-lg); }
 .section-link { color: var(--accent-cyan); font-size: 0.85rem; text-decoration: none; }
 
-.category-scroll { display: flex; gap: var(--space-md); overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.category-scroll { display: flex; gap: var(--space-md); overflow-x: auto; overflow-y: visible; scrollbar-width: none; padding: 6px 2px 6px; margin: -6px -2px; }
 .category-scroll::-webkit-scrollbar { display: none; }
 .cat-card {
   flex-shrink: 0; width: 120px; background: var(--bg-surface);

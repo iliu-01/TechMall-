@@ -2,8 +2,10 @@
   <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)">
-      <router-link to="/home" class="back-link">← 返回首页</router-link>
-      <el-input v-model="keyword" placeholder="搜索商品…" size="large" @keyup.enter="search" style="max-width:420px;margin-bottom:var(--space-lg);margin-top:var(--space-md)" />
+      <div class="toolbar">
+        <router-link to="/home" class="back-link">← 返回首页</router-link>
+        <el-input v-model="keyword" placeholder="搜索商品…" size="large" @keyup.enter="search" class="toolbar-search" />
+      </div>
       <div class="product-grid" v-if="products.length">
         <ProductCard v-for="p in products" :key="p.id" :product="p" />
       </div>
@@ -39,6 +41,12 @@ onMounted(() => search())
 </script>
 
 <style scoped>
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-xl); gap: var(--space-lg);
+}
+.toolbar-search { max-width: 400px; }
+.back-link { margin-bottom: 0; }
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
 @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
