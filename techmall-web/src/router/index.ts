@@ -3,6 +3,19 @@ import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(),
+  scrollBehavior(to, from, savedPosition) {
+    // 如果设置了 scrollToTop 标记，强制置顶
+    if (to.query._top === '1') {
+      return { top: 0 }
+    }
+    if (savedPosition) return savedPosition
+    // 回到首页时恢复保存的滚动位置
+    if (to.name === 'Home') {
+      const pos = sessionStorage.getItem('homeScrollY')
+      return pos ? { top: Number(pos) } : { top: 0 }
+    }
+    return { top: 0 }
+  },
   routes: [
     { path: '/login', name: 'Login', component: () => import('@/views/LoginView.vue') },
     { path: '/home', name: 'Home', component: () => import('@/views/HomeView.vue') },

@@ -84,6 +84,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
 import ProductCard from '@/components/ProductCard.vue'
@@ -161,6 +162,11 @@ async function loadData() {
 
 onMounted(loadData)
 onUnmounted(() => clearInterval(timer))
+
+// 离开首页时保存滚动位置
+onBeforeRouteLeave(() => {
+  sessionStorage.setItem('homeScrollY', String(window.scrollY))
+})
 </script>
 
 <style scoped>

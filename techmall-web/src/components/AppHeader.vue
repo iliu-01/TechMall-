@@ -1,9 +1,9 @@
 <template>
   <nav class="top-nav">
     <div class="nav-inner">
-      <router-link to="/home" class="logo">
+      <a class="logo" @click="goHome">
         <span class="mark">⚡</span>TechMall
-      </router-link>
+      </a>
 
       <div class="nav-search">
         <input
@@ -64,6 +64,11 @@ const roleClass = computed(() => {
   }
   return map[userStore.role] || ''
 })
+
+function goHome() {
+  sessionStorage.removeItem('homeScrollY')
+  router.push('/home')
+}
 
 function search() {
   if (keyword.value.trim()) {
