@@ -16,12 +16,12 @@ public class InternalUserController {
     private final UserMapper userMapper;
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
+    public User getUser(@PathVariable("id") Long id) {
         return userMapper.selectById(id);
     }
 
     @GetMapping("/{id}/role")
-    public Map<String, String> getRole(@PathVariable Long id) {
+    public Map<String, String> getRole(@PathVariable("id") Long id) {
         User user = userMapper.selectById(id);
         Map<String, String> result = new HashMap<>();
         result.put("role", user != null ? user.getRole() : null);

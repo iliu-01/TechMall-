@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Result<User> getUser(@PathVariable Long id) {
+    public Result<User> getUser(@PathVariable("id") Long id) {
         User user = userService.getUser(id);
         return Result.success(user);
     }
@@ -59,7 +59,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/status")
-    public Result<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
+    public Result<Void> updateStatus(@PathVariable("id") Long id, @RequestBody Map<String, Integer> body) {
         userService.updateUserStatus(id, body.get("status"));
         return Result.success();
     }

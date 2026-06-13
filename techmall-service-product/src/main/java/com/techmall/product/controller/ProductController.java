@@ -7,6 +7,8 @@ import com.techmall.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class ProductController {
      * 公开 - 获取商品详情
      */
     @GetMapping("/{id}")
-    public Result<Product> getById(@PathVariable Long id) {
+    public Result<Product> getById(@PathVariable("id") Long id) {
         return Result.success(productService.getProductById(id));
     }
 
@@ -46,7 +48,7 @@ public class ProductController {
      * 商家 - 更新商品（仅能修改自己的）
      */
     @PutMapping("/{id}")
-    public Result<Void> update(@PathVariable Long id,
+    public Result<Void> update(@PathVariable("id") Long id,
                                @RequestBody Product product,
                                @RequestHeader("X-User-Id") Long userId) {
         product.setId(id);
@@ -58,7 +60,7 @@ public class ProductController {
      * 商家 - 删除商品（仅能删除自己的）
      */
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id,
+    public Result<Void> delete(@PathVariable("id") Long id,
                                @RequestHeader("X-User-Id") Long userId) {
         productService.deleteProduct(id, userId);
         return Result.success();
@@ -68,10 +70,11 @@ public class ProductController {
      * 商家 - 上架/下架
      */
     @PutMapping("/{id}/status")
-    public Result<Void> updateStatus(@PathVariable Long id,
-                                     @RequestBody Product product,
-                                     @RequestHeader("X-User-Id") Long userId) {
-        productService.updateStatus(id, product.getStatus(), userId);
+    public Result<Void> updateStatus(@PathVariable("id") Long id,
+                                     @RequestBody Map<String, Integer> body,
+                                     @RequestHeader("X-User-Id") Long userId,
+                                     @RequestHeader(value = "X-User-Role", defaultValue = "USER") String role) {
+        productService.updateStatus(id, body.get("status"), userId, role);
         return Result.success();
     }
 }

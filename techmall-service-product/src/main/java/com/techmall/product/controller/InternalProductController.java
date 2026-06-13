@@ -21,7 +21,7 @@ public class InternalProductController {
      * 内部 - 根据 ID 获取完整商品信息
      */
     @GetMapping("/{id}")
-    public Result<Product> getById(@PathVariable Long id) {
+    public Result<Product> getById(@PathVariable("id") Long id) {
         Product product = productMapper.selectById(id);
         if (product == null) {
             throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND);
@@ -33,7 +33,7 @@ public class InternalProductController {
      * 内部 - 扣减库存
      */
     @PutMapping("/{id}/stock")
-    public Result<Void> deductStock(@PathVariable Long id,
+    public Result<Void> deductStock(@PathVariable("id") Long id,
                                     @RequestBody Map<String, Integer> body) {
         Integer quantity = body.get("quantity");
         if (quantity == null || quantity <= 0) {

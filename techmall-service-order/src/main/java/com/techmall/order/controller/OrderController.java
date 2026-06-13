@@ -29,7 +29,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public Result<?> getOrderDetail(@PathVariable Long id) {
+    public Result<?> getOrderDetail(@PathVariable("id") Long id) {
         return orderService.getOrderDetail(id);
     }
 
@@ -48,14 +48,14 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status")
-    public Result<?> updateStatus(@PathVariable Long id,
+    public Result<?> updateStatus(@PathVariable("id") Long id,
                                   @RequestBody Map<String, String> body) {
         String status = body.get("status");
         return orderService.updateOrderStatus(id, status);
     }
 
     @PutMapping("/{id}/cancel")
-    public Result<?> cancelOrder(@PathVariable Long id,
+    public Result<?> cancelOrder(@PathVariable("id") Long id,
                                  @RequestHeader("X-User-Id") Long userId) {
         return orderService.cancelOrder(id, userId);
     }

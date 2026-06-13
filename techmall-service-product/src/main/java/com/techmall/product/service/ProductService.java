@@ -31,7 +31,7 @@ public interface ProductService {
     void deleteProduct(Long id, Long userId);
 
     /**
-     * 更新商品状态（上架/下架）
+     * 更新商品状态（上架/下架），ADMIN 可操作任意商品，MERCHANT 仅自己
      */
-    void updateStatus(Long id, Integer status, Long userId);
+    void updateStatus(Long id, Integer status, Long userId, String role);
 }

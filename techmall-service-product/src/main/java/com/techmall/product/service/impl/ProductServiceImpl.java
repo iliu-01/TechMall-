@@ -69,12 +69,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateStatus(Long id, Integer status, Long userId) {
+    public void updateStatus(Long id, Integer status, Long userId, String role) {
         Product existing = productMapper.selectById(id);
         if (existing == null) {
             throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND);
         }
-        if (!existing.getMerchantId().equals(userId)) {
+        // ADMIN 可以操作任意商品，MERCHANT 只能操作自己的
+        if (!"ADMIN".equals(role) && !existing.getMerchantId().equals(userId)) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
         productMapper.updateStatus(id, status);
