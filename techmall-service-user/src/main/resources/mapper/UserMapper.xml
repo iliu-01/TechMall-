@@ -17,19 +17,19 @@
 
     <select id="selectById" resultMap="BaseResultMap">
         SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
-        FROM `user`
+        FROM `t_user`
         WHERE id = #{id}
     </select>
 
     <select id="selectByUsername" resultMap="BaseResultMap">
         SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
-        FROM `user`
+        FROM `t_user`
         WHERE username = #{username}
     </select>
 
     <select id="selectList" resultMap="BaseResultMap">
         SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
-        FROM `user`
+        FROM `t_user`
         <where>
             <if test="role != null and role != ''">
                 AND role = #{role}
@@ -44,12 +44,12 @@
     </select>
 
     <insert id="insert" parameterType="com.techmall.user.entity.User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO `user` (username, password, nickname, phone, email, role, status, created_at, updated_at)
+        INSERT INTO `t_user` (username, password, nickname, phone, email, role, status, created_at, updated_at)
         VALUES (#{username}, #{password}, #{nickname}, #{phone}, #{email}, #{role}, #{status}, NOW(), NOW())
     </insert>
 
     <update id="updateById" parameterType="com.techmall.user.entity.User">
-        UPDATE `user`
+        UPDATE `t_user`
         <set>
             <if test="nickname != null">nickname = #{nickname},</if>
             <if test="phone != null">phone = #{phone},</if>
@@ -60,7 +60,7 @@
     </update>
 
     <update id="updateStatus">
-        UPDATE `user`
+        UPDATE `t_user`
         SET status = #{status}, updated_at = NOW()
         WHERE id = #{id}
     </update>
