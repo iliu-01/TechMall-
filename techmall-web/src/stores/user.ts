@@ -12,6 +12,9 @@ export const useUserStore = defineStore('user', () => {
 
   async function login(username: string, password: string) {
     const res: any = await request.post('/user/login', { username, password })
+    if (res.code !== 200 || !res.data) {
+      throw new Error(res.message || '登录失败')
+    }
     token.value = res.data.token
     userInfo.value = res.data
     localStorage.setItem('token', res.data.token)
