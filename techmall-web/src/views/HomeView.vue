@@ -5,25 +5,23 @@
     <!-- Hero Banner Carousel -->
     <section class="page-container" style="margin-top: var(--space-xl)">
       <div class="hero-banner" v-if="slides.length">
-        <button class="carousel-arrow carousel-prev" @click="goPrev">‹</button>
         <div class="hero-content" :key="current">
           <div class="hero-tag">{{ slides[current].tag }}</div>
           <h1>{{ slides[current].title }}<span class="highlight">{{ slides[current].highlight }}</span></h1>
           <p class="hero-desc">{{ slides[current].desc }}</p>
           <div class="hero-actions">
-            <a class="btn-primary" @click="$router.push(`/product/${slides[current].productId}`)">立即选购 →</a>
-            <a class="btn-ghost" @click="$router.push('/products')">了解更多</a>
+            <router-link :to="`/product/${slides[current].productId}`" class="btn-primary">立即选购 →</router-link>
+            <router-link to="/products" class="btn-ghost">了解更多</router-link>
           </div>
         </div>
-        <div class="hero-visual" :key="'v'+current" @click="$router.push(`/product/${slides[current].productId}`)">
-          <div class="hero-showcase">
+        <div class="hero-visual" :key="'v'+current">
+          <div class="hero-showcase" @click="$router.push(`/product/${slides[current].productId}`)">
             <div class="product-icon">{{ slides[current].icon }}</div>
             <div class="spec-line">{{ slides[current].spec1 }}</div>
             <div class="spec-line">{{ slides[current].spec2 }}</div>
             <div class="price-tag">¥{{ slides[current].price?.toLocaleString() }}</div>
           </div>
         </div>
-        <button class="carousel-arrow carousel-next" @click="goNext">›</button>
       </div>
       <div class="hero-dots">
         <span v-for="(_s, i) in slides" :key="i" :class="{ active: i === current }" @click="goToSlide(i)"></span>
@@ -116,16 +114,6 @@ function goToSlide(i: number) {
   resetTimer()
 }
 
-function goPrev() {
-  current.value = (current.value - 1 + slides.value.length) % slides.value.length
-  resetTimer()
-}
-
-function goNext() {
-  current.value = (current.value + 1) % slides.value.length
-  resetTimer()
-}
-
 function startTimer() {
   timer = setInterval(() => {
     current.value = (current.value + 1) % slides.value.length
@@ -183,22 +171,11 @@ onUnmounted(() => clearInterval(timer))
   flex-direction: column; justify-content: center;
   animation: fadeIn 0.5s ease;
 }
-.hero-visual { display: flex; align-items: center; justify-content: center; cursor: pointer; animation: fadeIn 0.5s ease; }
+.hero-visual { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.5s ease; }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.carousel-arrow {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  background: var(--bg-glass); backdrop-filter: blur(8px);
-  border: 1px solid var(--border-subtle); border-radius: 50%;
-  width: 44px; height: 44px; display: flex; align-items: center;
-  justify-content: center; font-size: 1.5rem; color: var(--text-secondary);
-  cursor: pointer; z-index: 5; transition: all var(--duration-fast);
-}
-.carousel-arrow:hover { color: var(--accent-cyan); border-color: var(--border-active); background: var(--bg-elevated); }
-.carousel-prev { left: var(--space-md); }
-.carousel-next { right: var(--space-md); }
 .hero-tag {
   font-family: var(--font-display); font-weight: 600; font-size: 0.75rem;
   letter-spacing: 0.15em; color: var(--accent-cyan);
@@ -217,6 +194,7 @@ onUnmounted(() => clearInterval(timer))
   padding: 11px 26px; border-radius: 24px; text-decoration: none;
   display: inline-flex; align-items: center; gap: 6px;
   transition: all var(--duration-fast);
+  cursor: pointer;
 }
 .btn-primary { background: var(--accent-cyan); color: #060b14; }
 .btn-primary:hover { box-shadow: 0 0 24px rgba(0,198,242,0.35); }
