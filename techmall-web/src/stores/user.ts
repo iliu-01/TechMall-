@@ -19,6 +19,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = res.data
     localStorage.setItem('token', res.data.token)
     localStorage.setItem('userInfo', JSON.stringify(res.data))
+    sessionStorage.removeItem('homeScrollY')
   }
 
   async function register(username: string, password: string, role: string) {
@@ -30,6 +31,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('userInfo')
+    sessionStorage.removeItem('homeScrollY')
     router.push('/login')
   }
 
