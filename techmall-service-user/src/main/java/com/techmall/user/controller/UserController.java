@@ -50,10 +50,10 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    public Result<PageDTO<User>> list(@RequestParam(required = false) String role,
-                                       @RequestParam(required = false) String keyword,
-                                       @RequestParam(defaultValue = "1") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
+    public Result<PageDTO<User>> list(@RequestParam(name = "role", required = false) String role,
+                                       @RequestParam(name = "keyword", required = false) String keyword,
+                                       @RequestParam(name = "page", defaultValue = "1") int page,
+                                       @RequestParam(name = "size", defaultValue = "10") int size) {
         PageDTO<User> pageDTO = userService.listUsers(role, keyword, page, size);
         return Result.success(pageDTO);
     }

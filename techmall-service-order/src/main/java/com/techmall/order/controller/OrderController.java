@@ -23,8 +23,8 @@ public class OrderController {
 
     @GetMapping("/my")
     public Result<?> getMyOrders(@RequestHeader("X-User-Id") Long userId,
-                                 @RequestParam(defaultValue = "1") int page,
-                                 @RequestParam(defaultValue = "10") int size) {
+                                 @RequestParam(name = "page", defaultValue = "1") int page,
+                                 @RequestParam(name = "size", defaultValue = "10") int size) {
         return orderService.getMyOrders(userId, page, size);
     }
 
@@ -35,15 +35,15 @@ public class OrderController {
 
     @GetMapping("/merchant")
     public Result<?> getMerchantOrders(@RequestHeader("X-User-Id") Long userId,
-                                       @RequestParam(defaultValue = "1") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
+                                       @RequestParam(name = "page", defaultValue = "1") int page,
+                                       @RequestParam(name = "size", defaultValue = "10") int size) {
         return orderService.getMerchantOrders(userId, page, size);
     }
 
     @GetMapping("/list")
-    public Result<?> listAllOrders(@RequestParam(defaultValue = "1") int page,
-                                   @RequestParam(defaultValue = "10") int size,
-                                   @RequestParam(required = false) String status) {
+    public Result<?> listAllOrders(@RequestParam(name = "page", defaultValue = "1") int page,
+                                   @RequestParam(name = "size", defaultValue = "10") int size,
+                                   @RequestParam(name = "status", required = false) String status) {
         return orderService.listAllOrders(page, size, status);
     }
 

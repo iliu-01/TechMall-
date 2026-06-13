@@ -20,10 +20,10 @@ public class ProductController {
      * 公开 - 分页查询商品列表
      */
     @GetMapping("/list")
-    public Result<PageDTO<Product>> list(@RequestParam(required = false) Long categoryId,
-                                         @RequestParam(required = false) String keyword,
-                                         @RequestParam(defaultValue = "1") int page,
-                                         @RequestParam(defaultValue = "10") int size) {
+    public Result<PageDTO<Product>> list(@RequestParam(name = "categoryId", required = false) Long categoryId,
+                                         @RequestParam(name = "keyword", required = false) String keyword,
+                                         @RequestParam(name = "page", defaultValue = "1") int page,
+                                         @RequestParam(name = "size", defaultValue = "10") int size) {
         return Result.success(productService.listProducts(categoryId, keyword, page, size));
     }
 
