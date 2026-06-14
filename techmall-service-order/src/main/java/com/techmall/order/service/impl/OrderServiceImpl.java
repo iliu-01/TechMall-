@@ -156,7 +156,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Result<?> updateOrderStatus(Long orderId, String newStatus) {
+    public Result<?> updateOrderStatus(Long orderId, String newStatus, Long userId) {
         if (!VALID_STATUSES.contains(newStatus)) {
             return Result.fail(ResultCode.BAD_REQUEST.getCode(), "无效的订单状态: " + newStatus);
         }
@@ -168,6 +168,10 @@ public class OrderServiceImpl implements OrderService {
         Set<String> allowed = ALLOWED_TRANSITIONS.getOrDefault(currentStatus, Set.of());
         if (!allowed.contains(newStatus)) {
             throw new BusinessException(ResultCode.ORDER_STATUS_ERROR);
+        }
+        // COMPLETED 仅下单用户本人可操作
+        if ("COMPLETED".equals(newStatus) && !order.getUserId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
         }
         orderMapper.updateStatus(orderId, newStatus);
         return Result.success();

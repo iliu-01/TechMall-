@@ -50,9 +50,10 @@ public class OrderController {
 
     @PutMapping("/{id}/status")
     public Result<?> updateStatus(@PathVariable("id") Long id,
-                                  @RequestBody Map<String, String> body) {
+                                  @RequestBody Map<String, String> body,
+                                  @RequestHeader("X-User-Id") Long userId) {
         String status = body.get("status");
-        return orderService.updateOrderStatus(id, status);
+        return orderService.updateOrderStatus(id, status, userId);
     }
 
     @PutMapping("/{id}/cancel")

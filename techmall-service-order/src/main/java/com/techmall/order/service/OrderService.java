@@ -14,7 +14,7 @@ public interface OrderService {
 
     Result<?> listAllOrders(int page, int size, String status, Long userId);
 
-    Result<?> updateOrderStatus(Long orderId, String newStatus);
+    Result<?> updateOrderStatus(Long orderId, String newStatus, Long userId);
 
     Result<?> cancelOrder(Long orderId, Long userId);
 
