@@ -15,6 +15,7 @@ public class User {
     private String email;
     private String role;
     private Integer status;
+    private java.math.BigDecimal balance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -20,4 +20,6 @@ public interface UserMapper {
     int updateById(User user);
 
     int updateStatus(@Param("id") Long id, @Param("status") Integer status);
+
+    int updateBalance(@Param("id") Long id, @Param("balance") java.math.BigDecimal balance);
 }

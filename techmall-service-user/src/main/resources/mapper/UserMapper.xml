@@ -11,24 +11,25 @@
         <result column="email" property="email"/>
         <result column="role" property="role"/>
         <result column="status" property="status"/>
+        <result column="balance" property="balance"/>
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>
     </resultMap>
 
     <select id="selectById" resultMap="BaseResultMap">
-        SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
+        SELECT id, username, password, nickname, phone, email, role, status, balance, created_at, updated_at
         FROM `t_user`
         WHERE id = #{id}
     </select>
 
     <select id="selectByUsername" resultMap="BaseResultMap">
-        SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
+        SELECT id, username, password, nickname, phone, email, role, status, balance, created_at, updated_at
         FROM `t_user`
         WHERE username = #{username}
     </select>
 
     <select id="selectList" resultMap="BaseResultMap">
-        SELECT id, username, password, nickname, phone, email, role, status, created_at, updated_at
+        SELECT id, username, password, nickname, phone, email, role, status, balance, created_at, updated_at
         FROM `t_user`
         <where>
             <if test="role != null and role != ''">
@@ -62,6 +63,11 @@
     <update id="updateStatus">
         UPDATE `t_user`
         SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateBalance">
+        UPDATE `t_user` SET balance = #{balance}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 

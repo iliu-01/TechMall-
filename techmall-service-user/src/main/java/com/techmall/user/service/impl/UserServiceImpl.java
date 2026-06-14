@@ -86,6 +86,8 @@ public class UserServiceImpl implements UserService {
         result.put("userId", user.getId());
         result.put("username", user.getUsername());
         result.put("role", user.getRole());
+        result.put("nickname", user.getNickname());
+        result.put("balance", user.getBalance());
         return result;
     }
 

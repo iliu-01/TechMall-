@@ -17,16 +17,25 @@
 
       <div class="nav-actions">
         <template v-if="userStore.isLoggedIn">
-          <span class="nav-role" :class="roleClass">{{ userStore.role }}</span>
+          <!-- 仅用户/商家显示昵称和余额 -->
+          <span v-if="userStore.role !== 'ADMIN'" class="nav-user-info">
+            <span class="nav-nickname">{{ userStore.userInfo?.nickname || userStore.userInfo?.username }}</span>
+            <span class="nav-balance">
+              {{ userStore.role === 'MERCHANT' ? '💰' : '💳' }}
+              ¥{{ Number(userStore.userInfo?.balance || 0).toLocaleString() }}
+            </span>
+          </span>
+          <span v-if="userStore.role === 'ADMIN'" class="nav-role role-admin">管理员</span>
           <el-dropdown>
             <span class="user-avatar">👤</span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item v-if="userStore.role === 'USER'" @click="$router.push('/orders')">我的订单</el-dropdown-item>
-                <el-dropdown-item v-if="userStore.role === 'MERCHANT'" @click="$router.push('/merchant/products')">商品管理</el-dropdown-item>
-                <el-dropdown-item v-if="userStore.role === 'MERCHANT'" @click="$router.push('/merchant/orders')">订单管理</el-dropdown-item>
-                <el-dropdown-item v-if="userStore.role === 'ADMIN'" @click="$router.push('/admin/users')">管理后台</el-dropdown-item>
-                <el-dropdown-item divided @click="userStore.logout()">退出登录</el-dropdown-item>
+                <el-dropdown-item v-if="userStore.role === 'USER'" @click="$router.push('/orders')">📋 我的订单</el-dropdown-item>
+                <el-dropdown-item v-if="userStore.role === 'MERCHANT'" @click="$router.push('/merchant/products')">📦 商品管理</el-dropdown-item>
+                <el-dropdown-item v-if="userStore.role === 'MERCHANT'" @click="$router.push('/merchant/orders')">📊 订单管理</el-dropdown-item>
+                <el-dropdown-item v-if="userStore.role === 'ADMIN'" @click="$router.push('/admin/users')">⚙️ 管理后台</el-dropdown-item>
+                <el-dropdown-item v-if="userStore.role !== 'ADMIN'" @click="$router.push('/account')">👤 账户设置</el-dropdown-item>
+                <el-dropdown-item divided @click="userStore.logout()">🚪 退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -44,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
@@ -55,15 +64,6 @@ const router = useRouter()
 const userStore = useUserStore()
 const cartStore = useCartStore()
 const keyword = ref('')
-
-const roleClass = computed(() => {
-  const map: Record<string, string> = {
-    ADMIN: 'role-admin',
-    MERCHANT: 'role-merchant',
-    USER: 'role-user',
-  }
-  return map[userStore.role] || ''
-})
 
 function goHome() {
   sessionStorage.removeItem('homeScrollY')
@@ -122,6 +122,11 @@ function search() {
 .role-admin { color: var(--accent-rose); background: rgba(244,63,94,0.1); }
 .role-merchant { color: var(--accent-amber); background: rgba(245,158,11,0.1); }
 .role-user { color: var(--accent-cyan); background: rgba(0,198,242,0.1); }
+.nav-user-info {
+  display: flex; flex-direction: column; align-items: flex-end; line-height: 1.3;
+}
+.nav-nickname { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+.nav-balance { font-size: 0.7rem; color: var(--accent-amber); font-family: var(--font-display); }
 .user-avatar { cursor: pointer; font-size: 1.2rem; padding: 4px; }
 .login-btn { font-size: 0.85rem; color: var(--accent-cyan); font-weight: 500; text-decoration: none; }
 .cart-btn {

@@ -11,6 +11,7 @@ const router = createRouter({
     { path: '/home', name: 'Home', component: () => import('@/views/HomeView.vue') },
     { path: '/products', name: 'Products', component: () => import('@/views/ProductListView.vue') },
     { path: '/product/:id', name: 'ProductDetail', component: () => import('@/views/ProductDetailView.vue') },
+    { path: '/account', name: 'Account', component: () => import('@/views/AccountView.vue'), meta: { roles: ['USER', 'MERCHANT'] } },
     { path: '/cart', name: 'Cart', component: () => import('@/views/CartView.vue'), meta: { roles: ['USER'] } },
     { path: '/orders', name: 'Orders', component: () => import('@/views/OrderListView.vue'), meta: { roles: ['USER'] } },
     { path: '/orders/:id', name: 'OrderDetail', component: () => import('@/views/OrderDetailView.vue'), meta: { roles: ['USER', 'MERCHANT', 'ADMIN'] } },
