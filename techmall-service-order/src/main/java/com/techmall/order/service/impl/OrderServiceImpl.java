@@ -12,6 +12,7 @@ import com.techmall.order.dto.OrderItemDTO;
 import com.techmall.order.entity.Order;
 import com.techmall.order.entity.OrderItem;
 import com.techmall.order.feign.ProductFeignClient;
+import com.techmall.order.feign.UserFeignClient;
 import com.techmall.order.mapper.OrderItemMapper;
 import com.techmall.order.mapper.OrderMapper;
 import com.techmall.order.service.OrderService;
@@ -31,6 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final ProductFeignClient productFeignClient;
+    private final UserFeignClient userFeignClient;
 
     private static final Set<String> VALID_STATUSES = Set.of("PENDING", "PAID", "SHIPPED", "DELIVERED", "COMPLETED", "CANCELLED");
     private static final Map<String, Set<String>> ALLOWED_TRANSITIONS = Map.of(
@@ -184,6 +186,27 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ResultCode.ORDER_STATUS_ERROR);
         }
         orderMapper.updateStatus(orderId, "CANCELLED");
+        return Result.success();
+    }
+
+    @Override
+    public Result<?> payOrder(Long orderId, Long userId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        if (!"PENDING".equals(order.getStatus())) {
+            throw new BusinessException(ResultCode.ORDER_STATUS_ERROR);
+        }
+        if (!order.getUserId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+        // 调用用户服务扣减余额
+        Map<String, Object> deductBody = new HashMap<>();
+        deductBody.put("amount", order.getTotalAmount());
+        Result<?> deductResult = userFeignClient.deductBalance(userId, deductBody);
+        if (deductResult.getCode() != 200) {
+            return Result.fail(400, "余额不足");
+        }
+        orderMapper.updateStatus(orderId, "PAID");
         return Result.success();
     }
 }

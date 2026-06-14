@@ -60,4 +60,10 @@ public class OrderController {
                                  @RequestHeader("X-User-Id") Long userId) {
         return orderService.cancelOrder(id, userId);
     }
+
+    @PutMapping("/{id}/pay")
+    public Result<?> payOrder(@PathVariable("id") Long id,
+                              @RequestHeader("X-User-Id") Long userId) {
+        return orderService.payOrder(id, userId);
+    }
 }

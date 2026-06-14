@@ -11,6 +11,9 @@ public class UserFeignFallbackFactory implements FallbackFactory<UserFeignClient
     @Override
     public UserFeignClient create(Throwable cause) {
         return new UserFeignClient() {
+            @Override public Result<?> deductBalance(Long id, java.util.Map<String, Object> body) {
+                return Result.fail(ResultCode.SERVICE_BUSY);
+            }
             @Override
             public Result<?> getUserById(Long id) {
                 return Result.fail(ResultCode.SERVICE_BUSY);

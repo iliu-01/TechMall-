@@ -17,4 +17,6 @@ public interface OrderService {
     Result<?> updateOrderStatus(Long orderId, String newStatus);
 
     Result<?> cancelOrder(Long orderId, Long userId);
+
+    Result<?> payOrder(Long orderId, Long userId);
 }
