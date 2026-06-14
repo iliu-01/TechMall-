@@ -4,8 +4,9 @@
     <div class="page-container" style="margin-top: var(--space-xl)">
       <div class="toolbar">
         <router-link to="/home" class="back-link">← 返回首页</router-link>
-        <el-input v-model="keyword" placeholder="搜索商品…" size="large" @keyup.enter="search" class="toolbar-search" />
+        <el-input v-model="keyword" placeholder="搜索商品、店铺…" size="large" @keyup.enter="search" class="toolbar-search" />
       </div>
+      <h2 v-if="shopName" class="shop-title">🏪 {{ shopName }}</h2>
       <div class="product-grid" v-if="products.length">
         <ProductCard v-for="p in products" :key="p.id" :product="p" />
       </div>
@@ -29,6 +30,15 @@ const keyword = ref((route.query.keyword as string) || '')
 const categoryId = ref(route.query.categoryId ? Number(route.query.categoryId) : undefined)
 const merchantId = ref(route.query.merchantId ? Number(route.query.merchantId) : undefined)
 const products = ref<any[]>([])
+const shopName = ref('')
+
+async function fetchShopName() {
+  if (!merchantId.value) return
+  try {
+    const r: any = await request.get(`/user/${merchantId.value}`)
+    shopName.value = r.data?.nickname || r.data?.username || ''
+  } catch { /* 忽略 */ }
+}
 
 async function search() {
   const params: any = { page: 1, size: 20 }
@@ -39,10 +49,11 @@ async function search() {
   products.value = res.data?.records || []
 }
 
-onMounted(() => search())
+onMounted(() => { search(); fetchShopName() })
 </script>
 
 <style scoped>
+.shop-title { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: var(--space-lg); color: var(--accent-cyan); }
 .toolbar {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: var(--space-xl); gap: var(--space-lg);
