@@ -11,6 +11,7 @@ public class Product {
     private Long id;
     private String name;
     private String description;
+    private String tags;
     private BigDecimal price;
     private Integer stock;
     private Long categoryId;

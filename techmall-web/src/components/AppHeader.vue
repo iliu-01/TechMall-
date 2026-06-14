@@ -44,7 +44,7 @@
           <router-link to="/login" class="login-btn">登录</router-link>
         </template>
 
-        <button class="cart-btn" @click="$emit('toggleCart')">
+        <button v-if="userStore.role === 'USER' || !userStore.isLoggedIn" class="cart-btn" @click="$emit('toggleCart')">
           🛒<span v-if="cartStore.totalCount" class="cart-badge">{{ cartStore.totalCount }}</span>
         </button>
       </div>
@@ -101,7 +101,7 @@ function search() {
 .logo {
   font-family: var(--font-display); font-weight: 900; font-size: 1.3rem;
   color: var(--text-primary); display: flex; align-items: center; gap: 8px;
-  flex-shrink: 0; text-decoration: none;
+  flex-shrink: 0; text-decoration: none; cursor: pointer;
 }
 .logo .mark {
   width: 32px; height: 32px;

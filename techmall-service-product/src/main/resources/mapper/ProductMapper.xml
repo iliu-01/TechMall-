@@ -7,6 +7,7 @@
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
+        <result property="tags" column="tags"/>
         <result property="price" column="price"/>
         <result property="stock" column="stock"/>
         <result property="categoryId" column="category_id"/>
@@ -18,14 +19,14 @@
     </resultMap>
 
     <select id="selectById" resultMap="productMap">
-        SELECT id, name, description, price, stock, category_id,
+        SELECT id, name, description, tags, price, stock, category_id,
                merchant_id, image_url, status, created_at, updated_at
         FROM t_product
         WHERE id = #{id}
     </select>
 
     <select id="selectList" resultMap="productMap">
-        SELECT id, name, description, price, stock, category_id,
+        SELECT id, name, description, tags, price, stock, category_id,
                merchant_id, image_url, status, created_at, updated_at
         FROM t_product
         <where>
@@ -47,9 +48,9 @@
 
     <insert id="insert" parameterType="com.techmall.product.entity.Product"
             useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_product (name, description, price, stock, category_id,
+        INSERT INTO t_product (name, description, tags, price, stock, category_id,
                                merchant_id, image_url, status, created_at, updated_at)
-        VALUES (#{name}, #{description}, #{price}, #{stock}, #{categoryId},
+        VALUES (#{name}, #{description}, #{tags}, #{price}, #{stock}, #{categoryId},
                 #{merchantId}, #{imageUrl}, #{status}, NOW(), NOW())
     </insert>
 
@@ -58,6 +59,7 @@
         <set>
             <if test="name != null">name = #{name},</if>
             <if test="description != null">description = #{description},</if>
+            <if test="tags != null">tags = #{tags},</if>
             <if test="price != null">price = #{price},</if>
             <if test="stock != null">stock = #{stock},</if>
             <if test="categoryId != null">category_id = #{categoryId},</if>

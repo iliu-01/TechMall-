@@ -5,7 +5,8 @@
       <h2 class="section-title">✏️ 编辑商品</h2>
       <el-form :model="form" label-width="80px" v-if="loaded">
         <el-form-item label="名称"><el-input v-model="form.name" /></el-form-item>
-        <el-form-item label="描述"><el-input v-model="form.description" type="textarea" /></el-form-item>
+        <el-form-item label="描述"><el-input v-model="form.description" type="textarea" placeholder="商品详细介绍" /></el-form-item>
+        <el-form-item label="规格标签"><el-input v-model="form.tags" placeholder="逗号分隔，如: 骁龙 8 Gen5,200MP,120W 快充" /></el-form-item>
         <el-form-item label="价格"><el-input-number v-model="form.price" :min="0" :precision="2" /></el-form-item>
         <el-form-item label="库存"><el-input-number v-model="form.stock" :min="0" /></el-form-item>
         <el-form-item><el-button type="primary" @click="submit" :loading="submitting" style="border-radius:20px">保存修改</el-button></el-form-item>
@@ -27,7 +28,7 @@ const router = useRouter()
 
 const submitting = ref(false)
 const loaded = ref(false)
-const form = reactive({ name: '', description: '', price: 0, stock: 0 })
+const form = reactive({ name: '', description: '', tags: '', price: 0, stock: 0 })
 
 onMounted(async () => {
   const res: any = await request.get(`/product/${route.params.id}`)

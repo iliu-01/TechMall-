@@ -154,7 +154,7 @@ async function loadData() {
       tag: p.id === 8 ? '⚡ 闪购' : '🎯 今日特价',
       oldPrice: p.id === 8 ? 1999 : p.id === 6 ? 3299 : undefined,
       icon: p.name.includes('耳机') ? '🎧' : '📦',
-      desc: p.description?.split('+').slice(0, 2).join('·') || '',
+      desc: p.tags?.split(',').slice(0, 2).join(' · ') || '',
     }))
 
   startTimer()

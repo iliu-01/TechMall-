@@ -16,7 +16,7 @@
           <div style="color:var(--text-muted);margin-bottom:var(--space-xl)">
             库存: {{ product.stock ?? 0 }} 件 | 商家ID: {{ product.merchantId }}
           </div>
-          <div class="detail-actions">
+          <div class="detail-actions" v-if="userStore.role === 'USER'">
             <el-input-number v-model="qty" :min="1" :max="Math.max(product.stock ?? 0, 1)" :disabled="(product.stock ?? 0) === 0" size="large" />
             <el-button type="primary" size="large" @click="addToCart" style="border-radius:24px" :disabled="(product.stock ?? 0) === 0">
               {{ (product.stock ?? 0) === 0 ? '已售罄' : '加入购物车' }}
@@ -33,20 +33,22 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import request from '@/utils/request'
+import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import { ElMessage } from 'element-plus'
 import AppHeader from '@/components/AppHeader.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 
 const route = useRoute()
+const userStore = useUserStore()
 const cartStore = useCartStore()
 const showCart = ref(false)
 const product = ref<any>(null)
 const qty = ref(1)
 
 const specs = computed(() => {
-  if (!product.value?.description) return []
-  return product.value.description.split('+').map((s: string) => s.trim()).filter(Boolean)
+  if (!product.value?.tags) return []
+  return product.value.tags.split(',').map((s: string) => s.trim()).filter(Boolean)
 })
 
 const icon = computed(() => {

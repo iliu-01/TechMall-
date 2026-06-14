@@ -55,8 +55,8 @@ const brand = computed(() => {
 })
 
 const specs = computed(() => {
-  const desc = props.product.description || ''
-  return desc.split('+').map((s: string) => s.trim()).filter(Boolean).slice(0, 3)
+  const tags = props.product.tags || ''
+  return tags.split(',').map((s: string) => s.trim()).filter(Boolean).slice(0, 3)
 })
 
 const tagText = computed(() => {
