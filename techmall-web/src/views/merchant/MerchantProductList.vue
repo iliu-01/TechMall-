@@ -51,8 +51,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import request from '@/utils/request'
+import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import AppHeader from '@/components/AppHeader.vue'
+
+const userStore = useUserStore()
 
 const products = ref<any[]>([])
 const loading = ref(false)
@@ -74,7 +77,7 @@ const cellStyle = {
 
 async function fetch() {
   loading.value = true
-  const res: any = await request.get('/product/list', { params: { page: 1, size: 100 } })
+  const res: any = await request.get('/product/list', { params: { page: 1, size: 100, merchantId: userStore.userInfo.userId, includeOffShelf: true } })
   products.value = res.data?.records || []
   loading.value = false
 }
