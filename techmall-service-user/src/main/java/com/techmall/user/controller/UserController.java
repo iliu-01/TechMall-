@@ -43,6 +43,12 @@ public class UserController {
         return Result.success(updated);
     }
 
+    @PutMapping("/recharge")
+    public Result<?> recharge(@RequestHeader("X-User-Id") Long userId,
+                              @RequestBody Map<String, Object> body) {
+        return userService.recharge(userId, new java.math.BigDecimal(body.get("amount").toString()));
+    }
+
     @GetMapping("/{id}")
     public Result<User> getUser(@PathVariable("id") Long id) {
         User user = userService.getUser(id);

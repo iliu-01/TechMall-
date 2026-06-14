@@ -13,6 +13,22 @@
         <div class="info-row"><span class="info-label">注册时间</span><span>{{ userStore.userInfo?.createdAt || '—' }}</span></div>
       </div>
 
+      <!-- 充值（仅用户） -->
+      <template v-if="userStore.role === 'USER'">
+        <h3 style="margin-top:var(--space-xl);margin-bottom:var(--space-md);font-family:var(--font-display)">💳 余额充值</h3>
+        <div class="info-card">
+          <div class="recharge-grid">
+            <button v-for="a in fixedAmounts" :key="a" class="recharge-btn" @click="rechargeAmount = a" :class="{ active: rechargeAmount === a }">
+              ¥{{ a.toLocaleString() }}
+            </button>
+          </div>
+          <div class="recharge-custom">
+            <el-input-number v-model="rechargeAmount" :min="1" :step="100" :max="99999" placeholder="自定义金额" style="width:180px" />
+            <el-button type="primary" :loading="recharging" @click="doRecharge" style="border-radius:20px">确认充值</el-button>
+          </div>
+        </div>
+      </template>
+
       <!-- 修改信息 -->
       <h3 style="margin-top:var(--space-xl);margin-bottom:var(--space-md);font-family:var(--font-display)">✏️ 修改信息</h3>
       <el-card style="background:var(--bg-surface);border-color:var(--border-subtle)">
@@ -42,8 +58,12 @@ import CartDrawer from '@/components/CartDrawer.vue'
 const userStore = useUserStore()
 const showCart = ref(false)
 const saving = ref(false)
+const recharging = ref(false)
 
 const form = reactive({ nickname: '', phone: '', email: '', password: '' })
+
+const fixedAmounts = [100, 500, 1000, 5000, 10000]
+const rechargeAmount = ref(100)
 
 const roleLabel = computed(() => {
   const map: Record<string, string> = { USER: '普通用户', MERCHANT: '商家', ADMIN: '管理员' }
@@ -62,6 +82,22 @@ onMounted(async () => {
     }
   } catch { /* 忽略 */ }
 })
+
+async function doRecharge() {
+  if (rechargeAmount.value <= 0) return
+  recharging.value = true
+  try {
+    const res: any = await request.put('/user/recharge', { amount: rechargeAmount.value })
+    const newBalance = res.data?.balance
+    if (userStore.userInfo) {
+      userStore.userInfo.balance = newBalance
+      localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo))
+    }
+    ElMessage.success(`充值成功！当前余额 ¥${Number(newBalance).toLocaleString()}`)
+  } catch (e: any) {
+    ElMessage.error(e?.response?.data?.message || '充值失败')
+  } finally { recharging.value = false }
+}
 
 async function save() {
   saving.value = true
@@ -98,4 +134,15 @@ async function save() {
 .info-row:last-child { border-bottom: none; }
 .info-label { color: var(--text-muted); font-size: 0.85rem; }
 .balance-val { font-family: var(--font-display); font-weight: 700; color: var(--accent-amber); font-size: 1.1rem; }
+
+.recharge-grid { display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-bottom: var(--space-md); }
+.recharge-btn {
+  padding: 8px 18px; border: 1px solid var(--border-subtle); border-radius: 20px;
+  background: transparent; color: var(--text-secondary); cursor: pointer;
+  font-family: var(--font-display); font-size: 0.85rem; font-weight: 600;
+  transition: all var(--duration-fast);
+}
+.recharge-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.recharge-btn.active { border-color: var(--accent-cyan); background: rgba(0,198,242,0.1); color: var(--accent-cyan); }
+.recharge-custom { display: flex; align-items: center; gap: var(--space-md); }
 </style>

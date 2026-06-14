@@ -5,6 +5,7 @@ import com.techmall.user.dto.LoginDTO;
 import com.techmall.user.dto.RegisterDTO;
 import com.techmall.user.entity.User;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public interface UserService {
@@ -24,4 +25,6 @@ public interface UserService {
     void updateUserStatus(Long id, Integer status);
 
     java.util.List<User> getMerchants();
+
+    com.techmall.common.result.Result<?> recharge(Long userId, BigDecimal amount);
 }

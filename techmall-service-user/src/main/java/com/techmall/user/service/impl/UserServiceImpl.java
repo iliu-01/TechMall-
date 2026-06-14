@@ -13,8 +13,10 @@ import com.techmall.user.mapper.UserMapper;
 import com.techmall.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.techmall.common.result.Result;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,5 +161,22 @@ public class UserServiceImpl implements UserService {
             user.setPassword(null);
         }
         return merchants;
+    }
+
+    @Override
+    public Result<?> recharge(Long userId, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return Result.fail(400, "充值金额必须大于0");
+        }
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+        BigDecimal newBalance = user.getBalance().add(amount);
+        userMapper.updateBalance(userId, newBalance);
+        user.setBalance(newBalance);
+        Map<String, Object> data = new HashMap<>();
+        data.put("balance", newBalance);
+        return Result.success(data);
     }
 }
