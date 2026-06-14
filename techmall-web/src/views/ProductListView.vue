@@ -5,6 +5,7 @@
       <div class="toolbar">
         <div class="toolbar-links">
           <router-link to="/home" class="back-link">← 首页</router-link>
+          <a v-if="hasLastSearch" class="back-link" @click="backToSearch">← 返回搜索结果</a>
         </div>
         <el-input v-model="keyword" placeholder="搜索商品、店铺…" size="large" @keyup.enter="doSearch" class="toolbar-search" />
       </div>
@@ -39,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
@@ -56,6 +57,16 @@ const products = ref<any[]>([])
 const matchedMerchants = ref<any[]>([])
 const shopName = ref('')
 const searched = ref(false)
+
+const hasLastSearch = computed(() => !!sessionStorage.getItem('lastSearch'))
+
+function backToSearch() {
+  const raw = sessionStorage.getItem('lastSearch')
+  if (raw) {
+    sessionStorage.removeItem('lastSearch')
+    router.push({ path: '/products', query: JSON.parse(raw) })
+  }
+}
 
 async function fetchMerchants() {
   try {
