@@ -23,10 +23,6 @@ spring:
     multipart:
       max-file-size: 10MB
 
-techmall:
-  upload:
-    path: ./uploads
-
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.techmall.product.entity

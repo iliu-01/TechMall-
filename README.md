@@ -162,7 +162,7 @@ npm run dev
 |------|:--:|----------|----------|
 | Gateway | 8080 | `/api/**` | JWT 鉴权 + 路由转发 + 角色校验 + Sentinel 限流 |
 | User | 8081 | `/api/user/**` | 注册/登录、个人信息 CRUD、用户管理、余额、充值 |
-| Product | 8082 | `/api/product/**` | 商品 CRUD、分类、图片上传、库存管理、商家批量操作 |
+| Product | 8082 | `/api/product/**` | 商品 CRUD、分类、标签、库存管理、商家批量操作 |
 | Order | 8083 | `/api/order/**` | 下单（Feign+Sentinel）、支付、发货、确认收货、状态流转 |
 
 ### 关键 API
