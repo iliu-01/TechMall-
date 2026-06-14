@@ -98,7 +98,8 @@ async function cancelOrder() {
 async function shipOrder() {
   acting.value = true
   try {
-    await request.put(`/order/${detail.value.order.id}/status`, { status: 'SHIPPED' })
+    const res: any = await request.put(`/order/${detail.value.order.id}/status`, { status: 'SHIPPED' })
+    if (res.code !== 200) { ElMessage.error(res.message || '操作失败'); return }
     ElMessage.success('已发货')
     fetch()
   } catch (e: any) {
@@ -109,7 +110,8 @@ async function shipOrder() {
 async function confirmOrder() {
   acting.value = true
   try {
-    await request.put(`/order/${detail.value.order.id}/status`, { status: 'COMPLETED' })
+    const res: any = await request.put(`/order/${detail.value.order.id}/status`, { status: 'COMPLETED' })
+    if (res.code !== 200) { ElMessage.error(res.message || '操作失败'); return }
     ElMessage.success('已确认收货')
     fetch()
   } catch (e: any) {

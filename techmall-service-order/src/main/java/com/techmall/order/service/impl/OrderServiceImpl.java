@@ -38,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private static final Map<String, Set<String>> ALLOWED_TRANSITIONS = Map.of(
         "PENDING", Set.of("PAID", "CANCELLED"),
         "PAID", Set.of("SHIPPED", "CANCELLED"),
-        "SHIPPED", Set.of("DELIVERED"),
+        "SHIPPED", Set.of("DELIVERED", "COMPLETED"),
         "DELIVERED", Set.of("COMPLETED"),
         "COMPLETED", Set.of(),
         "CANCELLED", Set.of()
