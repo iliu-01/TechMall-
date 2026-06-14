@@ -48,4 +48,16 @@ public class InternalUserController {
         result.put("balance", newBalance);
         return Result.success(result);
     }
+
+    /** 增加余额（商家收款） */
+    @PutMapping("/{id}/add-balance")
+    public Result<?> addBalance(@PathVariable("id") Long id,
+                                 @RequestBody Map<String, Object> body) {
+        BigDecimal amount = new BigDecimal(body.get("amount").toString());
+        User user = userMapper.selectById(id);
+        if (user == null) throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        BigDecimal newBalance = user.getBalance().add(amount);
+        userMapper.updateBalance(id, newBalance);
+        return Result.success();
+    }
 }

@@ -210,6 +210,17 @@ public class OrderServiceImpl implements OrderService {
         if (deductResult.getCode() != 200) {
             return Result.fail(400, "余额不足");
         }
+        // 款项分配给各商家
+        List<OrderItem> items = orderItemMapper.selectByOrderId(orderId);
+        Map<Long, BigDecimal> merchantAmounts = new HashMap<>();
+        for (OrderItem item : items) {
+            merchantAmounts.merge(item.getMerchantId(), item.getAmount(), BigDecimal::add);
+        }
+        for (Map.Entry<Long, BigDecimal> entry : merchantAmounts.entrySet()) {
+            Map<String, Object> addBody = new HashMap<>();
+            addBody.put("amount", entry.getValue());
+            userFeignClient.addBalance(entry.getKey(), addBody);
+        }
         orderMapper.updateStatus(orderId, "PAID");
         return Result.success();
     }

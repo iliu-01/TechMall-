@@ -14,4 +14,7 @@ public interface UserFeignClient {
 
     @PutMapping("/internal/user/{id}/deduct-balance")
     Result<?> deductBalance(@PathVariable("id") Long id, @RequestBody Map<String, Object> body);
+
+    @PutMapping("/internal/user/{id}/add-balance")
+    Result<?> addBalance(@PathVariable("id") Long id, @RequestBody Map<String, Object> body);
 }
