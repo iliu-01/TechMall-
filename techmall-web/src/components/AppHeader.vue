@@ -53,9 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 
@@ -65,7 +64,6 @@ const router = useRouter()
 const userStore = useUserStore()
 const cartStore = useCartStore()
 const keyword = ref('')
-const merchants = ref<any[]>([])
 
 const roleLabel = computed(() => {
   const map: Record<string, string> = { USER: '用户', MERCHANT: '商家', ADMIN: '管理员' }
@@ -77,13 +75,6 @@ const roleClass = computed(() => {
   return map[userStore.role] || ''
 })
 
-onMounted(async () => {
-  try {
-    const res: any = await request.get('/user/merchants')
-    merchants.value = res.data || []
-  } catch { /* 忽略 */ }
-})
-
 function goHome() {
   sessionStorage.removeItem('homeScrollY')
   router.push('/home')
@@ -92,15 +83,7 @@ function goHome() {
 function search() {
   const term = keyword.value.trim()
   if (!term) return
-  // 先匹配商家名
-  const match = merchants.value.find((m: any) =>
-    (m.nickname || m.username || '').includes(term)
-  )
-  if (match) {
-    router.push({ path: '/products', query: { merchantId: match.id } })
-  } else {
-    router.push({ path: '/products', query: { keyword: term } })
-  }
+  router.push({ path: '/products', query: { keyword: term } })
 }
 </script>
 
