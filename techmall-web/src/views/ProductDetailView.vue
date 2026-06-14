@@ -2,8 +2,8 @@
   <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)" v-if="product">
-      <router-link to="/home" class="back-link">← 返回首页</router-link>
-      <router-link to="/products" class="back-link" style="margin-left:var(--space-md)">← 返回商品列表</router-link>
+      <router-link v-if="backSearch" :to="backSearch" class="back-link">← 返回搜索结果</router-link>
+      <router-link to="/home" class="back-link" :style="{marginLeft: backSearch ? 'var(--space-md)' : '0'}">← 返回首页</router-link>
       <div class="detail-layout">
         <div class="detail-img"><span style="font-size:6rem">{{ icon }}</span></div>
         <div class="detail-info">
@@ -49,6 +49,14 @@ const showCart = ref(false)
 const product = ref<any>(null)
 const merchantName = ref('')
 const qty = ref(1)
+
+// 从 sessionStorage 恢复上次搜索结果
+const backSearch = computed(() => {
+  try {
+    const raw = sessionStorage.getItem('lastSearch')
+    return raw ? { path: '/products', query: JSON.parse(raw) } : null
+  } catch { return null }
+})
 
 const specs = computed(() => {
   if (!product.value?.tags) return []
