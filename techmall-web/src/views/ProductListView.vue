@@ -3,8 +3,10 @@
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <div class="toolbar">
-        <router-link v-if="backSearch" :to="backSearch" class="back-link">← 返回搜索结果</router-link>
-        <router-link to="/home" class="back-link">← 返回首页</router-link>
+        <div class="toolbar-links">
+          <router-link to="/home" class="back-link">← 首页</router-link>
+          <a v-if="showBackToSearch" class="back-link" @click="goBackToSearch">← 返回搜索</a>
+        </div>
         <el-input v-model="keyword" placeholder="搜索商品、店铺…" size="large" @keyup.enter="doSearch" class="toolbar-search" />
       </div>
 
@@ -56,12 +58,16 @@ const matchedMerchants = ref<any[]>([])
 const shopName = ref('')
 const searched = ref(false)
 
-const backSearch = computed(() => {
+const showBackToSearch = computed(() => {
+  return !!sessionStorage.getItem('lastSearch')
+})
+
+function goBackToSearch() {
   try {
     const raw = sessionStorage.getItem('lastSearch')
-    return raw ? { path: '/products', query: JSON.parse(raw) } : null
-  } catch { return null }
-})
+    if (raw) router.push({ path: '/products', query: JSON.parse(raw) })
+  } catch { router.push('/products') }
+}
 
 async function fetchMerchants() {
   try {
@@ -130,10 +136,11 @@ watch(() => route.query, async (q) => {
 .shop-title { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: var(--space-lg); color: var(--accent-cyan); }
 .toolbar {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: var(--space-xl); gap: var(--space-lg);
+  margin-bottom: var(--space-xl); gap: var(--space-md); flex-wrap: wrap;
 }
-.toolbar-search { max-width: 400px; }
-.back-link { margin-bottom: 0; }
+.toolbar-links { display: flex; gap: var(--space-md); align-items: center; }
+.toolbar-search { max-width: 360px; }
+.back-link { margin-bottom: 0; cursor: pointer; }
 
 .merchant-section { margin-bottom: var(--space-xl); }
 .merchant-list { display: flex; gap: var(--space-md); flex-wrap: wrap; }
