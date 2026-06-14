@@ -67,7 +67,11 @@ async function fetch() {
 async function payOrder() {
   acting.value = true
   try {
-    await request.put(`/order/${detail.value.order.id}/pay`)
+    const res: any = await request.put(`/order/${detail.value.order.id}/pay`)
+    if (res.code !== 200) {
+      ElMessage.error(res.message || '支付失败')
+      return
+    }
     ElMessage.success('支付成功')
     // 刷新余额
     const me: any = await request.get('/user/me')

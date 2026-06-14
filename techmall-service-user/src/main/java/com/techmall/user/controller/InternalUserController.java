@@ -1,6 +1,7 @@
 package com.techmall.user.controller;
 
 import com.techmall.common.exception.BusinessException;
+import com.techmall.common.result.Result;
 import com.techmall.common.result.ResultCode;
 import com.techmall.user.entity.User;
 import com.techmall.user.mapper.UserMapper;
@@ -33,18 +34,18 @@ public class InternalUserController {
 
     /** 扣减余额，返回剩余余额 */
     @PutMapping("/{id}/deduct-balance")
-    public Map<String, Object> deductBalance(@PathVariable("id") Long id,
-                                              @RequestBody Map<String, Object> body) {
+    public Result<?> deductBalance(@PathVariable("id") Long id,
+                                    @RequestBody Map<String, Object> body) {
         BigDecimal amount = new BigDecimal(body.get("amount").toString());
         User user = userMapper.selectById(id);
         if (user == null) throw new BusinessException(ResultCode.USER_NOT_FOUND);
         if (user.getBalance().compareTo(amount) < 0) {
-            throw new BusinessException(400, "余额不足");
+            return Result.fail(400, "余额不足");
         }
         BigDecimal newBalance = user.getBalance().subtract(amount);
         userMapper.updateBalance(id, newBalance);
         Map<String, Object> result = new HashMap<>();
         result.put("balance", newBalance);
-        return result;
+        return Result.success(result);
     }
 }
