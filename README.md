@@ -43,46 +43,48 @@ techmall/
 
 - JDK 17+
 - Maven 3.9+
-- MySQL 8.0+ (密码 123456)
+- MySQL 8.0+
 - Node.js 18+
 
 ### 2. 启动中间件
 
 ```powershell
-# Nacos 注册+配置中心
-D:\Nacos\nacos-server-2.5.1\bin\startup.cmd -m standalone
+# Nacos 注册+配置中心（需先安装 Nacos 2.5.x，解压到任意目录）
+<NACOS_HOME>\bin\startup.cmd -m standalone
 # 访问 http://localhost:8848/nacos (默认 nacos/nacos)
 
-# Sentinel Dashboard（可选，监控限流熔断）
-java -jar E:/sentinel/sentinel-dashboard-1.8.9.jar --server.port=8858
+# Sentinel Dashboard（可选，从 GitHub Releases 下载 sentinel-dashboard-1.8.9.jar）
+java -jar sentinel-dashboard-1.8.9.jar --server.port=8858
 # 访问 http://localhost:8858 (默认 sentinel/sentinel)
 ```
 
 ### 3. 初始化数据库
 
+> 请根据实际 MySQL 密码修改 `-p` 参数
+
 ```powershell
-mysql -u root -p123456 < docs/sql/01_techmall_user.sql
-mysql -u root -p123456 < docs/sql/02_techmall_product.sql
-mysql -u root -p123456 < docs/sql/03_techmall_order.sql
+mysql -u root -p < docs/sql/01_techmall_user.sql
+mysql -u root -p < docs/sql/02_techmall_product.sql
+mysql -u root -p < docs/sql/03_techmall_order.sql
 ```
 
 ### 4. 编译 & 启动后端
 
 ```powershell
-cd E:\techmall
+# 在项目根目录执行
 mvn clean package -DskipTests
 
 # 4 个终端分别启动：
-java -jar techmall-gateway\target\techmall-gateway-1.0.0.jar
-java -jar techmall-service-user\target\techmall-service-user-1.0.0.jar
-java -jar techmall-service-product\target\techmall-service-product-1.0.0.jar
-java -jar techmall-service-order\target\techmall-service-order-1.0.0.jar
+java -jar techmall-gateway/target/techmall-gateway-1.0.0.jar
+java -jar techmall-service-user/target/techmall-service-user-1.0.0.jar
+java -jar techmall-service-product/target/techmall-service-product-1.0.0.jar
+java -jar techmall-service-order/target/techmall-service-order-1.0.0.jar
 ```
 
 ### 5. 启动前端
 
 ```powershell
-cd E:\techmall\techmall-web
+cd techmall-web
 npm install
 npm run dev
 # 访问 http://localhost:5173
@@ -233,7 +235,7 @@ Browser → Gateway(:8080)
 
 | 资源 | 路径 |
 |------|------|
-| 首页预览 | `E:\testEnvs\javaSpring\techmall-preview.html` |
-| Design System 规范 | `E:\testEnvs\javaSpring\techmall-design-system.html` |
+| 首页预览 | `techmall-preview.html` |
+| Design System 规范 | `techmall-design-system.html` |
 | 设计规格书 | `docs/superpowers/specs/2026-06-12-techmall-design.md` |
 | 实现计划 | `docs/superpowers/plans/2026-06-12-techmall-plan.md` |
