@@ -52,8 +52,14 @@ async function fetch() {
 }
 
 async function toggle(row: any) {
-  await request.put(`/user/${row.id}/status`, { status: row.status ? 0 : 1 })
-  ElMessage.success('状态已更新')
+  const newStatus = row.status ? 0 : 1
+  await request.put(`/user/${row.id}/status`, { status: newStatus })
+  // 如果是商家，同步下架/上架其所有商品
+  if (row.role === 'MERCHANT') {
+    // 内部端点调用批量更新商品状态
+    await request.put(`/product/merchant/${row.id}/status`, { status: newStatus })
+  }
+  ElMessage.success('状态已更新，商品同步处理')
   fetch()
 }
 

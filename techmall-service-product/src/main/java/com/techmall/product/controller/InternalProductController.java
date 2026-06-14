@@ -52,4 +52,15 @@ public class InternalProductController {
         }
         return Result.success();
     }
+
+    /**
+     * 内部 - 批量更新某商家所有商品状态（禁用商家时下架商品）
+     */
+    @PutMapping("/merchant/{merchantId}/status")
+    public Result<Void> updateStatusByMerchant(@PathVariable("merchantId") Long merchantId,
+                                               @RequestBody Map<String, Integer> body) {
+        Integer status = body.get("status");
+        productMapper.updateStatusByMerchantId(merchantId, status);
+        return Result.success();
+    }
 }

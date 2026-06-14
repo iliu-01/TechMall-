@@ -34,4 +34,6 @@ public interface ProductService {
      * 更新商品状态（上架/下架），ADMIN 可操作任意商品，MERCHANT 仅自己
      */
     void updateStatus(Long id, Integer status, Long userId, String role);
+
+    void updateStatusByMerchantId(Long merchantId, Integer status);
 }

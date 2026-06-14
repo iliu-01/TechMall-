@@ -82,4 +82,8 @@
         DELETE FROM t_product WHERE id = #{id}
     </delete>
 
+    <update id="updateStatusByMerchantId">
+        UPDATE t_product SET status = #{status}, updated_at = NOW()
+        WHERE merchant_id = #{merchantId}
+    </update>
 </mapper>

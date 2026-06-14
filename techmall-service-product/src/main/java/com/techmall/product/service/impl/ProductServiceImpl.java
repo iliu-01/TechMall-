@@ -81,4 +81,9 @@ public class ProductServiceImpl implements ProductService {
         }
         productMapper.updateStatus(id, status);
     }
+
+    @Override
+    public void updateStatusByMerchantId(Long merchantId, Integer status) {
+        productMapper.updateStatusByMerchantId(merchantId, status);
+    }
 }

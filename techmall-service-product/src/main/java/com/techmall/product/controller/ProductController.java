@@ -79,4 +79,14 @@ public class ProductController {
         productService.updateStatus(id, body.get("status"), userId, role);
         return Result.success();
     }
+
+    /**
+     * 管理员 - 批量上架/下架某商家的所有商品
+     */
+    @PutMapping("/merchant/{merchantId}/status")
+    public Result<Void> updateStatusByMerchant(@PathVariable("merchantId") Long merchantId,
+                                                @RequestBody Map<String, Integer> body) {
+        productService.updateStatusByMerchantId(merchantId, body.get("status"));
+        return Result.success();
+    }
 }
