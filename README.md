@@ -43,7 +43,7 @@ techmall/
 
 - JDK 17+
 - Maven 3.9+
-- MySQL 8.0+
+- MySQL 8.0+ (密码 123456)
 - Node.js 18+
 
 ### 2. 启动中间件
@@ -90,108 +90,128 @@ npm run dev
 
 ## 测试账号
 
-| 用户名 | 密码 | 角色 | 余额 | 初始数据 |
-|--------|------|------|:----:|----------|
-| admin | 123456 | 管理员 | — | 全站管理权限 |
-| merchant1 | 123456 | 商家 | 50,000 | 5 个数码商品 |
-| merchant2 | 123456 | 商家 | 50,000 | 3 个耳机商品 |
-| user1 | 123456 | 普通用户 | 10,000 | — |
+| 用户名 | 密码 | 角色 | 余额 | 说明 |
+|--------|------|------|:----:|------|
+| admin | 123456 | 管理员 | — | 全站管理 |
+| merchant1 | 123456 | 商家 | 50,000 | 数码旗舰店（手机/电脑/平板） |
+| merchant2 | 123456 | 商家 | 50,000 | 耳机专营店（耳机/耳塞） |
+| user1 | 123456 | 普通用户 | 10,000 | 普通买家 |
 
 ## 功能地图
 
 ### 首页
 
-- 🔄 4 页轮播广告，对应真实商品，点击跳转详情
-- 🔭 6 大品类快速检索
-- ✨ 新品速递（8 个真实商品，从数据库拉取）
-- 🔥 限时抢购（2 个特价商品，点击跳详情）
-- 🛒 迷你购物车抽屉
-- 📍 滚动位置记忆——子页面返回时恢复位置
+- 🔄 **4 页轮播广告** — 对应真实商品，渐变切换动画，底部圆点切换
+- 🔭 **6 大品类** — 响应式网格布局，点击筛选
+- ✨ **新品速递** — 8 个真实商品，从 API 动态加载
+- 🔥 **限时抢购** — 2 个特价商品，点击跳详情
+- 🗺️ **搜索店铺+商品** — 输入商家名/商品名，先展示匹配店铺再展示商品
+- 🛒 **迷你购物车抽屉**（仅 USER 可见）
+- 📍 **滚动位置记忆** — 离开主页后返回恢复滚动位置
 
 ### 普通用户 (USER)
 
-| 功能 | 路径 |
-|------|------|
-| 浏览商品、搜索、按品类筛选 | `/home` `/products` `/product/:id` |
-| 加入购物车、提交订单 | `/cart` |
-| 查看我的订单、取消订单 | `/orders` |
-| 账户设置（修改昵称/手机/邮箱/密码） | `/account` |
-| 查看余额 | 导航栏 `💳 ¥余额` |
+| 功能 | 路径 | 说明 |
+|------|------|------|
+| 浏览商品 | `/home` `/products` `/product/:id` | 搜索、品类筛选、按商家浏览 |
+| 商品详情 | `/product/:id` | 查看规格标签、商家店铺入口 |
+| 购物车 & 下单 | `/cart` | 填写收货信息 → 提交订单 |
+| 订单管理 | `/orders` `/orders/:id` | 查看列表、支付、取消、确认收货 |
+| 余额充值 | `/account` | 固定金额(100~10000) + 自定义金额 |
+| 个人信息 | `/account` | 修改昵称/手机/邮箱/密码 |
+| 导航栏 | — | 角色标签 + 昵称 + 余额显示 |
 
 ### 商家 (MERCHANT)
 
-| 功能 | 路径 |
-|------|------|
-| 商品管理（增删改、上架/下架） | `/merchant/products` |
-| 本店订单（发货） | `/merchant/orders` |
-| 账户设置（修改昵称/手机/邮箱/密码） | `/account` |
-| 查看收益 | 导航栏 `💰 ¥余额` |
+| 功能 | 路径 | 说明 |
+|------|------|------|
+| 商品管理 | `/merchant/products` | 增删改、上架/下架、规格标签编辑 |
+| 本店订单 | `/merchant/orders` | 查看本店订单、发货 |
+| 账户设置 | `/account` | 修改信息 + 查看收益 |
+| 导航栏 | — | 角色标签 + 昵称 + 余额（💰收益） |
+| 购物车 | — | 不可见（商家不购物） |
+| 商品详情 | — | 只能查看，无加购按钮 |
 
 ### 管理员 (ADMIN)
 
-| 功能 | 路径 |
-|------|------|
-| 用户管理（启用/禁用、查看用户订单/商品） | `/admin/users` |
-| 全站商品管理（上架/下架） | `/admin/products` |
-| 分类管理（新增分类） | `/admin/categories` |
-| 全站订单管理 | `/admin/orders` |
-| 查看指定用户的订单 | `/admin/user-orders?userId=` |
-| 管理指定商家的商品 | `/admin/user-products?merchantId=` |
+| 功能 | 路径 | 说明 |
+|------|------|------|
+| 用户管理 | `/admin/users` | 启用/禁用、查看用户订单/商家商品 |
+| 全站商品 | `/admin/products` | 上架/下架 |
+| 全站订单 | `/admin/orders` | 查看所有订单 |
+| 分类管理 | `/admin/categories` | 新增分类 |
+| 用户订单 | `/admin/user-orders?userId=` | 查看+取消指定用户订单 |
+| 商家商品 | `/admin/user-products?merchantId=` | 管理指定商家商品 |
+| 禁用商家 | — | 禁用商家时自动下架其全部商品 |
+
+## 订单全流程
+
+```
+用户下单(PENDING) → 💳模拟支付 → 扣用户余额、加商家收入 → PAID
+  → 📦商家发货 → SHIPPED → ✅确认收货 → COMPLETED
+  → ❌用户取消 → CANCELLED（仅 PENDING 状态）
+```
+
+**余额流转**: 用户支付 → 用户扣款 + 商家收款（按订单项分账给各商家）
 
 ## API 概览
 
 | 服务 | 端口 | 路径前缀 | 主要功能 |
 |------|:--:|----------|----------|
 | Gateway | 8080 | `/api/**` | JWT 鉴权 + 路由转发 + 角色校验 + Sentinel 限流 |
-| User | 8081 | `/api/user/**` | 注册/登录、个人信息 CRUD、用户管理、余额 |
+| User | 8081 | `/api/user/**` | 注册/登录、个人信息 CRUD、用户管理、余额、充值 |
 | Product | 8082 | `/api/product/**` | 商品 CRUD、分类、图片上传、库存管理、商家批量操作 |
-| Order | 8083 | `/api/order/**` | 下单（Feign+Sentinel）、订单管理、状态流转 |
+| Order | 8083 | `/api/order/**` | 下单（Feign+Sentinel）、支付、发货、确认收货、状态流转 |
 
 ### 关键 API
 
 ```
-POST   /api/user/register             注册
-POST   /api/user/login                登录（返回 JWT + 用户信息 + 余额）
-GET    /api/user/me                   当前用户信息
-PUT    /api/user/me                   修改个人信息
-GET    /api/product/list              商品列表（支持 categoryId/keyword/merchantId）
-POST   /api/order                     创建订单（OpenFeign 调用 User + Product）
-PUT    /api/order/{id}/cancel         取消订单
+POST   /api/user/register                 注册
+POST   /api/user/login                    登录（返回 JWT + 用户信息 + 余额）
+GET    /api/user/me                       当前用户信息
+PUT    /api/user/me                       修改个人信息
+PUT    /api/user/recharge                 充值余额
+GET    /api/product/list                  商品列表（支持 categoryId/keyword/merchantId/includeOffShelf）
+POST   /api/order                         创建订单
+PUT    /api/order/{id}/pay                支付（扣用户余额 + 加商家收入）
+PUT    /api/order/{id}/status             状态流转（发货/确认收货）
+PUT    /api/order/{id}/cancel             取消订单
 PUT    /api/product/merchant/{id}/status  管理员批量操作商家商品
 ```
 
-### 内部端点（仅 localhost 访问）
+### 内部端点（Feign 服务间调用）
 
 ```
-GET    /internal/user/{id}           用户服务内部查询
-PUT    /internal/product/{id}/stock  原子库存扣减
-PUT    /internal/product/merchant/{id}/status  批量更新商家商品状态
+GET    /internal/user/{id}                用户查询
+PUT    /internal/user/{id}/deduct-balance 扣减余额
+PUT    /internal/user/{id}/add-balance    增加余额（商家收款）
+GET    /internal/product/{id}             商品查询
+PUT    /internal/product/{id}/stock       原子库存扣减
 ```
 
 ## 订单状态机
 
 ```
-PENDING → PAID → SHIPPED → COMPLETED
-   │        │
-   └─取消──→ CANCELLED
-   └─取消──→ CANCELLED
+PENDING ──支付──→ PAID ──发货──→ SHIPPED ──确认──→ COMPLETED
+   │                │
+   └──取消──→ CANCELLED  ←──取消──┘
 
-规则: 仅 PENDING 可取消 · 仅商家可发货 · 仅本人可确认完成
+规则: 仅 PENDING/PAID 可取消 · 商家/管理员可发货 · 仅买家可确认完成
 ```
 
-## 微服务调用链路（核心考点）
+## 微服务调用链路
 
 ```
 Browser → Gateway(:8080)
-  ├─ JwtAuthFilter (解析 JWT → X-User-Id header)
-  ├─ RoleAuthFilter (角色 + 路径校验)
+  ├─ JwtAuthFilter (解析 JWT → X-User-Id/X-User-Role header)
+  ├─ RoleAuthGatewayFilterFactory (角色 + 路径校验)
   └─ 路由转发
-       ├─ User(:8081)  — 注册/登录/用户管理
-       ├─ Product(:8082) — 商品/分类/图片
-       └─ Order(:8083)
-            ├─ Feign → User (验证用户)
+       ├─ User(:8081)     — 注册/登录/余额/用户管理
+       ├─ Product(:8082)  — 商品/分类/标签/库存
+       └─ Order(:8083)    — 下单/支付/发货/确认
+            ├─ Feign → User (验证用户 + 扣余额 + 加商家收入)
             ├─ Feign → Product (查价格 + 扣库存)
-            └─ @SentinelResource (createOrder 降级保护)
+            └─ @SentinelResource (createOrder 熔断降级)
 ```
 
 ## 核心考点覆盖
