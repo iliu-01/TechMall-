@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
 import ProductCard from '@/components/ProductCard.vue'
@@ -110,6 +110,11 @@ async function doSearch() {
 onMounted(async () => {
   await doSearch()
   await fetchShopName()
+})
+
+// 离开时保存搜索状态（供商品详情页返回使用）
+onBeforeRouteLeave(() => {
+  sessionStorage.setItem('lastSearch', JSON.stringify(route.query))
 })
 
 // 已经在 /products 页面时，query 变化也触发搜索
