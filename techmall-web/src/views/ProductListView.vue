@@ -27,12 +27,14 @@ const route = useRoute()
 const showCart = ref(false)
 const keyword = ref((route.query.keyword as string) || '')
 const categoryId = ref(route.query.categoryId ? Number(route.query.categoryId) : undefined)
+const merchantId = ref(route.query.merchantId ? Number(route.query.merchantId) : undefined)
 const products = ref<any[]>([])
 
 async function search() {
   const params: any = { page: 1, size: 20 }
   if (keyword.value) params.keyword = keyword.value
   if (categoryId.value) params.categoryId = categoryId.value
+  if (merchantId.value) params.merchantId = merchantId.value
   const res: any = await request.get('/product/list', { params })
   products.value = res.data?.records || []
 }

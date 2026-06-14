@@ -13,8 +13,11 @@
             <span v-for="s in specs" :key="s" class="spec-chip">{{ s }}</span>
           </div>
           <div class="detail-price">¥{{ product.price }}</div>
-          <div style="color:var(--text-muted);margin-bottom:var(--space-xl)">
-            库存: {{ product.stock ?? 0 }} 件 | 商家ID: {{ product.merchantId }}
+          <div class="merchant-row">
+            <span>库存: {{ product.stock ?? 0 }} 件</span>
+            <span v-if="merchantName" class="merchant-link" @click="$router.push({path:'/products', query:{merchantId: product.merchantId}})">
+              🏪 {{ merchantName }} 的店铺 →
+            </span>
           </div>
           <div class="detail-actions" v-if="userStore.role === 'USER'">
             <el-input-number v-model="qty" :min="1" :max="Math.max(product.stock ?? 0, 1)" :disabled="(product.stock ?? 0) === 0" size="large" />
@@ -44,6 +47,7 @@ const userStore = useUserStore()
 const cartStore = useCartStore()
 const showCart = ref(false)
 const product = ref<any>(null)
+const merchantName = ref('')
 const qty = ref(1)
 
 const specs = computed(() => {
@@ -65,6 +69,13 @@ async function fetch() {
   const id = route.params.id
   const res: any = await request.get(`/product/${id}`)
   product.value = res.data
+  // 获取商家信息
+  if (res.data?.merchantId) {
+    try {
+      const u: any = await request.get(`/user/${res.data.merchantId}`)
+      merchantName.value = u.data?.nickname || u.data?.username || ''
+    } catch { /* 忽略 */ }
+  }
 }
 
 function addToCart() {
@@ -111,5 +122,14 @@ onMounted(fetch)
   color: var(--accent-amber); margin-bottom: var(--space-md);
 }
 .detail-actions { display: flex; gap: var(--space-md); }
+.merchant-row {
+  display: flex; align-items: center; gap: var(--space-lg);
+  color: var(--text-muted); margin-bottom: var(--space-xl);
+}
+.merchant-link {
+  color: var(--accent-cyan); cursor: pointer; font-weight: 500;
+  transition: opacity var(--duration-fast);
+}
+.merchant-link:hover { opacity: 0.8; }
 @media (max-width: 768px) { .detail-layout { grid-template-columns: 1fr; } }
 </style>
