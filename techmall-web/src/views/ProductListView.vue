@@ -5,7 +5,6 @@
       <div class="toolbar">
         <div class="toolbar-links">
           <router-link to="/home" class="back-link">← 首页</router-link>
-          <a v-if="showBackToSearch" class="back-link" @click="goBackToSearch">← 返回搜索</a>
         </div>
         <el-input v-model="keyword" placeholder="搜索商品、店铺…" size="large" @keyup.enter="doSearch" class="toolbar-search" />
       </div>
@@ -57,17 +56,6 @@ const products = ref<any[]>([])
 const matchedMerchants = ref<any[]>([])
 const shopName = ref('')
 const searched = ref(false)
-
-const showBackToSearch = computed(() => {
-  return !!sessionStorage.getItem('lastSearch')
-})
-
-function goBackToSearch() {
-  try {
-    const raw = sessionStorage.getItem('lastSearch')
-    if (raw) router.push({ path: '/products', query: JSON.parse(raw) })
-  } catch { router.push('/products') }
-}
 
 async function fetchMerchants() {
   try {
