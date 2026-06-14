@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
@@ -89,6 +89,15 @@ async function doSearch() {
 }
 
 onMounted(async () => {
+  await doSearch()
+  await fetchShopName()
+})
+
+// 已经在 /products 页面时，query 变化也触发搜索
+watch(() => route.query, async (q) => {
+  keyword.value = (q.keyword as string) || ''
+  categoryId.value = q.categoryId ? Number(q.categoryId) : undefined
+  merchantId.value = q.merchantId ? Number(q.merchantId) : undefined
   await doSearch()
   await fetchShopName()
 })
