@@ -17,13 +17,13 @@
 
       <div class="nav-actions">
         <template v-if="userStore.isLoggedIn">
-          <!-- 仅用户/商家显示昵称和余额 -->
+          <!-- 用户/商家：角色标签 + 昵称 + 余额 -->
           <span v-if="userStore.role !== 'ADMIN'" class="nav-user-info">
-            <span class="nav-nickname">{{ userStore.userInfo?.nickname || userStore.userInfo?.username }}</span>
-            <span class="nav-balance">
-              {{ userStore.role === 'MERCHANT' ? '💰' : '💳' }}
-              ¥{{ Number(userStore.userInfo?.balance || 0).toLocaleString() }}
+            <span class="nav-user-top">
+              <span class="nav-role" :class="roleClass">{{ roleLabel }}</span>
+              <span class="nav-nickname">{{ userStore.userInfo?.nickname || userStore.userInfo?.username }}</span>
             </span>
+            <span class="nav-balance">¥{{ Number(userStore.userInfo?.balance || 0).toLocaleString() }}</span>
           </span>
           <span v-if="userStore.role === 'ADMIN'" class="nav-role role-admin">管理员</span>
           <el-dropdown>
@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
@@ -64,6 +64,16 @@ const router = useRouter()
 const userStore = useUserStore()
 const cartStore = useCartStore()
 const keyword = ref('')
+
+const roleLabel = computed(() => {
+  const map: Record<string, string> = { USER: '用户', MERCHANT: '商家', ADMIN: '管理员' }
+  return map[userStore.role] || ''
+})
+
+const roleClass = computed(() => {
+  const map: Record<string, string> = { ADMIN: 'role-admin', MERCHANT: 'role-merchant', USER: 'role-user' }
+  return map[userStore.role] || ''
+})
 
 function goHome() {
   sessionStorage.removeItem('homeScrollY')
@@ -125,8 +135,12 @@ function search() {
 .nav-user-info {
   display: flex; flex-direction: column; align-items: flex-end; line-height: 1.3;
 }
+.nav-user-top { display: flex; align-items: center; gap: 6px; }
 .nav-nickname { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
-.nav-balance { font-size: 0.7rem; color: var(--accent-amber); font-family: var(--font-display); }
+.nav-balance {
+  font-size: 0.72rem; color: var(--accent-amber);
+  font-family: var(--font-display); font-weight: 600;
+}
 .user-avatar { cursor: pointer; font-size: 1.2rem; padding: 4px; }
 .login-btn { font-size: 0.85rem; color: var(--accent-cyan); font-weight: 500; text-decoration: none; }
 .cart-btn {
