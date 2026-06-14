@@ -3,6 +3,7 @@
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <div class="toolbar">
+        <router-link v-if="backSearch" :to="backSearch" class="back-link">← 返回搜索结果</router-link>
         <router-link to="/home" class="back-link">← 返回首页</router-link>
         <el-input v-model="keyword" placeholder="搜索商品、店铺…" size="large" @keyup.enter="doSearch" class="toolbar-search" />
       </div>
@@ -14,7 +15,7 @@
       <div v-if="matchedMerchants.length && !merchantId" class="merchant-section">
         <h3 class="section-label">🔍 相关店铺</h3>
         <div class="merchant-list">
-          <div v-for="m in matchedMerchants" :key="m.id" class="shop-card" @click="$router.push({path:'/products', query:{merchantId: m.id}})">
+          <div v-for="m in matchedMerchants" :key="m.id" class="shop-card" @click="goShop(m.id)">
             <div class="shop-avatar">🏪</div>
             <div class="shop-info">
               <div class="shop-name">{{ m.nickname || m.username }}</div>
@@ -37,14 +38,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRoute, onBeforeRouteLeave } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import request from '@/utils/request'
 import AppHeader from '@/components/AppHeader.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 
 const route = useRoute()
+const router = useRouter()
 const showCart = ref(false)
 const keyword = ref((route.query.keyword as string) || '')
 const categoryId = ref(route.query.categoryId ? Number(route.query.categoryId) : undefined)
@@ -53,6 +55,13 @@ const products = ref<any[]>([])
 const matchedMerchants = ref<any[]>([])
 const shopName = ref('')
 const searched = ref(false)
+
+const backSearch = computed(() => {
+  try {
+    const raw = sessionStorage.getItem('lastSearch')
+    return raw ? { path: '/products', query: JSON.parse(raw) } : null
+  } catch { return null }
+})
 
 async function fetchMerchants() {
   try {
@@ -75,6 +84,11 @@ async function fetchShopName() {
     const r: any = await request.get(`/user/${merchantId.value}`)
     shopName.value = r.data?.nickname || r.data?.username || ''
   } catch { /* 忽略 */ }
+}
+
+function goShop(merchantId: number) {
+  sessionStorage.setItem('lastSearch', JSON.stringify(route.query))
+  router.push({ path: '/products', query: { merchantId } })
 }
 
 async function doSearch() {
