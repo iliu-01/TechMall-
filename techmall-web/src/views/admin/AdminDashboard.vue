@@ -15,11 +15,36 @@
         </div>
       </div>
 
-      <!-- 图表行 -->
+      <!-- 用户消费/商家销售列表 + 订单状态饼图 -->
       <div class="chart-row">
-        <div class="chart-box">
-          <h4>📈 销售额分布（按订单状态）</h4>
-          <v-chart :option="statusChartOption" style="height:320px" autoresize />
+        <div class="chart-box" style="overflow:auto">
+          <div class="chart-header">
+            <h4>🧑‍💼 用户消费 / 商家销售</h4>
+            <el-input v-model="userFilter" placeholder="搜索名称…" size="small" style="width:180px" clearable />
+          </div>
+          <el-table :data="filteredUsers" highlight-current-row @row-click="selectUser" max-height="260">
+            <el-table-column label="名称"><template #default="{row}"><span class="user-name-cell">{{ row.nickname || row.username }}</span></template></el-table-column>
+            <el-table-column label="角色" width="70"><template #default="{row}"><el-tag :type="row.role==='MERCHANT'?'warning':'info'" size="small">{{ row.role==='MERCHANT'?'商家':'用户' }}</el-tag></template></el-table-column>
+            <el-table-column label="金额" width="120" align="right"><template #default="{row}"><span class="price-cell">¥{{ amountFor(row).toLocaleString() }}</span></template></el-table-column>
+          </el-table>
+          <div v-if="pickedUser" class="user-detail">
+            <div class="detail-bar">
+              <span>{{ pickedUser.nickname || pickedUser.username }} 的{{ pickedUser.role==='MERCHANT' ? '商品销售' : '消费记录' }}</span>
+              <a @click="pickedUser=null" style="color:var(--accent-cyan);cursor:pointer">✕ 关闭</a>
+            </div>
+            <el-table :data="pickedItems" size="small" max-height="200">
+              <template v-if="pickedUser.role==='MERCHANT'">
+                <el-table-column prop="productName" label="商品" />
+                <el-table-column prop="quantity" label="销量" width="60" align="center" />
+                <el-table-column prop="amount" label="销售额" width="100" align="right"><template #default="{r}"><span class="price-cell">¥{{ Number(r.amount).toLocaleString() }}</span></template></el-table-column>
+              </template>
+              <template v-else>
+                <el-table-column prop="orderNo" label="订单号" width="180" />
+                <el-table-column prop="amount" label="金额" width="100" align="right"><template #default="{r}"><span class="price-cell">¥{{ Number(r.amount).toLocaleString() }}</span></template></el-table-column>
+                <el-table-column label="商品"><template #default="{r}">{{ r.items?.map((i:any)=>i.productName).join('、') }}</template></el-table-column>
+              </template>
+            </el-table>
+          </div>
         </div>
         <div class="chart-box">
           <h4>📊 订单状态分布</h4>
@@ -34,10 +59,6 @@
             <span class="chart-toggle" @click="merchantChartType = merchantChartType==='bar'?'pie':'bar'">{{ merchantChartType==='bar' ? '📊饼图' : '📊柱图' }}</span>
           </div>
           <v-chart :option="merchantChartOption" style="height:300px" autoresize />
-          <div v-if="selectedMerchant" class="merchant-detail">
-            <span>已选: 商家#{{ selectedMerchant }} | 销售额 ¥{{ Number(selectedMerchantSales).toLocaleString() }}</span>
-            <a @click="selectedMerchant=null" style="color:var(--accent-cyan);cursor:pointer;margin-left:8px">清除</a>
-          </div>
         </div>
         <div class="chart-box">
           <h4>🧑‍💼 用户角色分布</h4>
@@ -74,20 +95,59 @@ import AppFooter from '@/components/AppFooter.vue'
 
 use([BarChart, PieChart, GridComponent, TooltipComponent, LegendComponent, TitleComponent, CanvasRenderer])
 
-const orderStats = ref<any>({ byStatus: {}, recentOrders: [], byMerchant: {} })
+const orderStats = ref<any>({ byStatus: {}, recentOrders: [], byMerchant: {}, byUser: {}, userOrders: {} })
 const userCount = ref(0)
 const productCount = ref(0)
 const users = ref<any[]>([])
 const products = ref<any[]>([])
 const merchantChartType = ref('bar')
-const selectedMerchant = ref<number | null>(null)
-const selectedMerchantSales = ref(0)
+
+// 用户列表
+const userFilter = ref('')
+const pickedUser = ref<any>(null)
+const pickedItems = ref<any[]>([])
 
 function sType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : s === 'COMPLETED' ? 'success' : 'danger' }
 
 const statusNames: Record<string,string> = { PENDING:'待付款', PAID:'已付款', SHIPPED:'已发货', COMPLETED:'已完成', CANCELLED:'已取消' }
 
 const merchantNames = ref<Record<number,string>>({})
+
+const filteredUsers = computed(() => {
+  const t = userFilter.value.toLowerCase()
+  return users.value.filter((u:any)=> u.role !== 'ADMIN' && (u.nickname||u.username||'').toLowerCase().includes(t))
+})
+
+function amountFor(user: any) {
+  const map = user.role === 'MERCHANT' ? orderStats.value.byMerchant : orderStats.value.byUser
+  return Number((map || {})[String(user.id)] || 0)
+}
+
+function selectUser(row: any) {
+  pickedUser.value = row
+  const uid = String(row.id)
+  if (row.role === 'MERCHANT') {
+    // 遍历所有用户订单，筛选该商家商品
+    const all = orderStats.value.userOrders || {}
+    const agg: Record<number,any> = {}
+    for (const key of Object.keys(all)) {
+      for (const o of (all[key] || [])) {
+        for (const item of (o.items || [])) {
+          if (Number(item.merchantId) === Number(row.id)) {
+            const k = item.productId
+            if (!agg[k]) agg[k] = { productName: item.productName, quantity: 0, amount: 0 }
+            agg[k].quantity += Number(item.quantity || 0)
+            agg[k].amount += Number(item.amount || 0)
+          }
+        }
+      }
+    }
+    pickedItems.value = Object.values(agg)
+  } else {
+    const orders = (orderStats.value.userOrders || {})[uid] || []
+    pickedItems.value = orders
+  }
+}
 
 
 const statCards = computed(() => [
@@ -98,18 +158,6 @@ const statCards = computed(() => [
 ])
 
 const recentOrders = computed(() => orderStats.value.recentOrders || [])
-
-const statusChartOption = computed(() => ({
-  tooltip: { trigger: 'axis' },
-  grid: { left: 60, right: 20, top: 30, bottom: 30 },
-  xAxis: { type: 'category', data: Object.keys(orderStats.value.byStatus || {}).map(k => statusNames[k]||k), axisLabel: { color: '#94a3b8', fontSize: 11 } },
-  yAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
-  series: [{
-    type: 'bar', data: Object.values(orderStats.value.byStatus || {}),
-    itemStyle: { color: '#00c6f2', borderRadius: [4,4,0,0] }, barWidth: 32,
-    label: { show: true, position: 'top', color: '#94a3b8', fontSize: 11 },
-  }],
-}))
 
 const pieChartOption = computed(() => ({
   tooltip: { trigger: 'item', formatter: '{b}: {c}单 ({d}%)' },
