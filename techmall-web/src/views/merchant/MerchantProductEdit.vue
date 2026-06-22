@@ -13,6 +13,7 @@
       </el-form>
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">
@@ -20,6 +21,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 

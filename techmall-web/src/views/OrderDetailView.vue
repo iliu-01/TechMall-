@@ -27,7 +27,8 @@
       <div class="table-wrap">
         <el-table :data="detail.items" style="margin-top:var(--space-md)">
           <el-table-column prop="productName" label="商品" />
-          <el-table-column prop="productPrice" label="单价"><template #default="{row}">¥{{ Number(row.productPrice).toLocaleString() }}</template></el-table-column>
+          <el-table-column prop="productPrice" label="单价"><template #default="{row}">¥{{ Number(row.productPrice).toLocaleString() }}  <AppFooter />
+</template></el-table-column>
           <el-table-column prop="quantity" label="数量" width="100" />
           <el-table-column prop="amount" label="小计"><template #default="{row}">¥{{ Number(row.amount).toLocaleString() }}</template></el-table-column>
         </el-table>
@@ -43,6 +44,7 @@ import { useRoute } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 

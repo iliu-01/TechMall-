@@ -31,7 +31,8 @@
             </el-button>
           </div>
         </el-card>
-      </template>
+        <AppFooter />
+</template>
     </div>
     <CartDrawer :visible="showCart" @close="showCart = false" />
   </div>
@@ -44,6 +45,7 @@ import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 

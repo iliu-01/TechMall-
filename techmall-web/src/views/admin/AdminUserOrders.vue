@@ -7,7 +7,8 @@
       <div class="table-wrap">
         <el-table :data="orders" v-loading="loading">
           <el-table-column prop="orderNo" label="订单号" width="220" />
-          <el-table-column label="金额" width="120"><template #default="{row}"><span class="price-cell">¥{{ Number(row.totalAmount).toLocaleString() }}</span></template></el-table-column>
+          <el-table-column label="金额" width="120"><template #default="{row}"><span class="price-cell">¥{{ Number(row.totalAmount).toLocaleString() }}</span>  <AppFooter />
+</template></el-table-column>
           <el-table-column prop="status" label="状态" width="110" align="center">
             <template #default="{row}"><el-tag :type="statusType(row.status)" size="small">{{ row.status }}</el-tag></template>
           </el-table-column>
@@ -30,6 +31,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 const route = useRoute()

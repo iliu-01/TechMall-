@@ -8,7 +8,8 @@
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="username" label="用户名" width="120" />
         <el-table-column prop="nickname" label="昵称" width="120" />
-        <el-table-column prop="role" label="角色" width="100"><template #default="{row}"><el-tag>{{ row.role }}</el-tag></template></el-table-column>
+        <el-table-column prop="role" label="角色" width="100"><template #default="{row}"><el-tag>{{ row.role }}</el-tag>  <AppFooter />
+</template></el-table-column>
         <el-table-column prop="status" label="状态" width="80"><template #default="{row}"><el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '正常' : '禁用' }}</el-tag></template></el-table-column>
         <el-table-column label="管理" width="200" align="center">
           <template #default="{row}">
@@ -37,6 +38,7 @@
 import { ref, onMounted } from 'vue'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 

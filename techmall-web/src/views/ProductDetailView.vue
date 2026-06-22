@@ -30,6 +30,7 @@
     </div>
     <CartDrawer :visible="showCart" @close="showCart = false" />
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">
@@ -39,6 +40,7 @@ import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import { ElMessage } from 'element-plus'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 

@@ -37,12 +37,14 @@
     </div>
     <CartDrawer :visible="showCart" @close="showCart = false" />
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import request from '@/utils/request'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import CartDrawer from '@/components/CartDrawer.vue'

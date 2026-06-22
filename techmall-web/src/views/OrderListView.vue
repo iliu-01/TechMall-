@@ -6,7 +6,8 @@
       <div class="table-wrap">
         <el-table :data="orders" v-loading="loading">
           <el-table-column prop="orderNo" label="订单号" width="200" />
-          <el-table-column label="金额" width="120"><template #default="{row}"><span class="price-cell">¥{{ row.totalAmount }}</span></template></el-table-column>
+          <el-table-column label="金额" width="120"><template #default="{row}"><span class="price-cell">¥{{ row.totalAmount }}</span>  <AppFooter />
+</template></el-table-column>
           <el-table-column prop="status" label="状态" width="120" align="center"><template #default="{row}"><el-tag :type="statusType(row.status)">{{ row.status }}</el-tag></template></el-table-column>
           <el-table-column prop="receiverName" label="收货人" width="100" />
           <el-table-column label="操作" align="center"><template #default="{row}">
@@ -25,6 +26,7 @@
 import { ref, onMounted } from 'vue'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
+import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 
