@@ -25,7 +25,7 @@
           <el-table :data="filteredUsers" style="width:100%;min-width:400px" highlight-current-row @row-click="selectUser" max-height="260">
             <el-table-column prop="nickname" label="名称" min-width="120"><template #default="{row}"><span class="user-name-cell">{{ row.nickname || row.username }}</span></template></el-table-column>
             <el-table-column prop="role" label="角色" width="80" align="center"><template #default="{row}"><el-tag :type="row.role==='MERCHANT'?'warning':'info'" size="small">{{ row.role==='MERCHANT'?'商家':'用户' }}</el-tag></template></el-table-column>
-            <el-table-column label="金额" width="140" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(userSpending[String(row.id)]||0).toLocaleString() }}</span></template></el-table-column>
+            <el-table-column label="金额" width="140" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(row.role==='MERCHANT' ? (orderStats.value.byMerchant||{})[String(row.id)] : (orderStats.value.byUser||{})[String(row.id)] ||0).toLocaleString() }}</span></template></el-table-column>
           </el-table>
           <!-- 选中用户详情 -->
           <div v-if="selectedUserId" class="user-detail">
@@ -111,7 +111,6 @@ const userFilter = ref('')
 const selectedUserId = ref<number | null>(null)
 const selectedUserName = ref('')
 const selectedUserRole = ref('')
-const userSpending = ref<Record<string,number>>({})
 const selectedUserItems = ref<any[]>([])
 
 const filteredUsers = computed(() => {
@@ -126,21 +125,31 @@ function selectUser(row: any) {
   selectedUserId.value = row.id
   selectedUserName.value = row.nickname || row.username
   selectedUserRole.value = row.role
-  const uid = String(row.id) // JSON key 是字符串
-  const orders = orderStats.value.userOrders?.[uid] || []
+  const uid = String(row.id)
+  const orders = (orderStats.value.userOrders?.[uid] || []) as any[]
+
   if (row.role === 'MERCHANT') {
-    const map: Record<number,any> = {}
-    for (const o of orders) {
-      for (const item of (o.items || [])) {
-        if (Number(item.merchantId) === Number(row.id)) {
-          const key = item.productId
-          if (!map[key]) map[key] = { productName: item.productName, price: item.price, quantity: 0, amount: 0 }
-          map[key].quantity += Number(item.quantity || 0)
-          map[key].amount += Number(item.amount || 0)
+    // 优先用订单数据，无订单则用商品列表
+    if (orders.length > 0) {
+      const map: Record<number,any> = {}
+      for (const o of orders) {
+        for (const item of (o.items || [])) {
+          if (Number(item.merchantId) === Number(row.id)) {
+            const key = item.productId
+            if (!map[key]) map[key] = { productName: item.productName, price: Number(item.price), quantity: 0, amount: 0 }
+            map[key].quantity += Number(item.quantity || 0)
+            map[key].amount += Number(item.amount || 0)
+          }
         }
       }
+      selectedUserItems.value = Object.values(map)
+    } else {
+      // 兜底：从商品列表展示该商家所有商品（价格为0表示无销售）
+      const allMerchantProducts = products.value.filter((p: any) => p.merchantId === row.id)
+      selectedUserItems.value = allMerchantProducts.map((p: any) => ({
+        productName: p.name, price: p.price, quantity: 0, amount: 0,
+      }))
     }
-    selectedUserItems.value = Object.values(map)
   } else {
     selectedUserItems.value = orders
   }
@@ -247,7 +256,6 @@ onMounted(async () => {
   orderStats.value = orderRes.data || {}
   userCount.value = userRes.data?.total || 0
   productCount.value = productRes.data?.total || 0
-  userSpending.value = orderRes.data?.byUser || {}
 
   const [allUsers, allProducts] = await Promise.all([
     request.get('/user/list', { params: { page:1, size:100 } }),
