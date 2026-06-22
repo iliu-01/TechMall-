@@ -15,38 +15,11 @@
         </div>
       </div>
 
-      <!-- 用户消费表 + 订单状态饼图 -->
+      <!-- 图表行 -->
       <div class="chart-row">
-        <div class="chart-box" style="overflow:auto">
-          <div class="chart-header">
-            <h4>🧑‍💼 用户消费 / 商家销售</h4>
-            <el-input v-model="userFilter" placeholder="搜索用户名…" size="small" style="width:180px" clearable />
-          </div>
-          <el-table :data="filteredUsers" style="width:100%;min-width:400px" highlight-current-row @row-click="selectUser" max-height="260">
-            <el-table-column prop="nickname" label="名称" min-width="120"><template #default="{row}"><span class="user-name-cell">{{ row.nickname || row.username }}</span></template></el-table-column>
-            <el-table-column prop="role" label="角色" width="80" align="center"><template #default="{row}"><el-tag :type="row.role==='MERCHANT'?'warning':'info'" size="small">{{ row.role==='MERCHANT'?'商家':'用户' }}</el-tag></template></el-table-column>
-            <el-table-column label="金额" width="140" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(row.role==='MERCHANT' ? (orderStats.value.byMerchant||{})[String(row.id)] : (orderStats.value.byUser||{})[String(row.id)] ||0).toLocaleString() }}</span></template></el-table-column>
-          </el-table>
-          <!-- 选中用户详情 -->
-          <div v-if="selectedUserId" class="user-detail">
-            <div class="detail-bar">
-              <span>{{ selectedUserName }} 的{{ selectedUserRole==='MERCHANT' ? '商品销售' : '消费记录' }}</span>
-              <a @click="selectedUserId=null" style="color:var(--accent-cyan);cursor:pointer">✕ 关闭</a>
-            </div>
-            <el-table :data="selectedUserItems" style="width:100%;min-width:350px" size="small" max-height="220">
-              <template v-if="selectedUserRole==='MERCHANT'">
-                <el-table-column prop="productName" label="商品" min-width="140" />
-                <el-table-column prop="price" label="单价" width="90" align="right"><template #default="{row}">¥{{ Number(row.price).toLocaleString() }}</template></el-table-column>
-                <el-table-column prop="quantity" label="数量" width="60" align="center" />
-                <el-table-column prop="amount" label="小计" width="100" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(row.amount).toLocaleString() }}</span></template></el-table-column>
-              </template>
-              <template v-else>
-                <el-table-column prop="orderNo" label="订单号" width="180" />
-                <el-table-column prop="amount" label="金额" width="100" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(row.amount).toLocaleString() }}</span></template></el-table-column>
-                <el-table-column label="包含商品" min-width="180"><template #default="{row}">{{ row.items?.map((i:any)=>i.productName).join('、') }}</template></el-table-column>
-              </template>
-            </el-table>
-          </div>
+        <div class="chart-box">
+          <h4>📈 销售额分布（按订单状态）</h4>
+          <v-chart :option="statusChartOption" style="height:320px" autoresize />
         </div>
         <div class="chart-box">
           <h4>📊 订单状态分布</h4>
@@ -57,12 +30,14 @@
       <div class="chart-row">
         <div class="chart-box">
           <div class="chart-header">
-            <h4 v-if="selectedUserId">📈 {{ selectedUserName }} 的{{ selectedUserRole==='MERCHANT' ? '商品销售' : '消费' }}明细</h4>
-            <h4 v-else>🏪 各商家销售额</h4>
-            <span class="chart-toggle" @click="detailChartType = detailChartType==='bar'?'pie':'bar'">{{ detailChartType==='bar' ? '📊饼图' : '📊柱图' }}</span>
+            <h4>🏪 各商家销售额</h4>
+            <span class="chart-toggle" @click="merchantChartType = merchantChartType==='bar'?'pie':'bar'">{{ merchantChartType==='bar' ? '📊饼图' : '📊柱图' }}</span>
           </div>
-          <v-chart v-if="selectedUserId" :option="userDetailChartOption" style="height:300px" autoresize />
-          <v-chart v-else :option="merchantChartOption" style="height:300px" autoresize />
+          <v-chart :option="merchantChartOption" style="height:300px" autoresize />
+          <div v-if="selectedMerchant" class="merchant-detail">
+            <span>已选: 商家#{{ selectedMerchant }} | 销售额 ¥{{ Number(selectedMerchantSales).toLocaleString() }}</span>
+            <a @click="selectedMerchant=null" style="color:var(--accent-cyan);cursor:pointer;margin-left:8px">清除</a>
+          </div>
         </div>
         <div class="chart-box">
           <h4>🧑‍💼 用户角色分布</h4>
@@ -99,62 +74,14 @@ import AppFooter from '@/components/AppFooter.vue'
 
 use([BarChart, PieChart, GridComponent, TooltipComponent, LegendComponent, TitleComponent, CanvasRenderer])
 
-const orderStats = ref<any>({ byStatus: {}, recentOrders: [], byMerchant: {}, byUser: {}, userOrders: {} })
+const orderStats = ref<any>({ byStatus: {}, recentOrders: [], byMerchant: {} })
 const userCount = ref(0)
 const productCount = ref(0)
 const users = ref<any[]>([])
 const products = ref<any[]>([])
-const detailChartType = ref('bar')
-
-// 用户表逻辑
-const userFilter = ref('')
-const selectedUserId = ref<number | null>(null)
-const selectedUserName = ref('')
-const selectedUserRole = ref('')
-const selectedUserItems = ref<any[]>([])
-
-const filteredUsers = computed(() => {
-  const term = userFilter.value.toLowerCase()
-  return users.value.filter((u:any)=> {
-    if (u.role === 'ADMIN') return false
-    return (u.nickname||u.username||'').toLowerCase().includes(term)
-  })
-})
-
-function selectUser(row: any) {
-  selectedUserId.value = row.id
-  selectedUserName.value = row.nickname || row.username
-  selectedUserRole.value = row.role
-  const uid = String(row.id)
-
-  if (row.role === 'MERCHANT') {
-    // 遍历所有用户的订单，筛选该商家的商品
-    const allOrders: Record<string,any[]> = orderStats.value.userOrders || {}
-    const map: Record<number,any> = {}
-    for (const uidKey of Object.keys(allOrders)) {
-      for (const o of (allOrders[uidKey] || [])) {
-        for (const item of (o.items || [])) {
-          if (Number(item.merchantId) === Number(row.id)) {
-            const key = item.productId
-            if (!map[key]) map[key] = { productName: item.productName, price: Number(item.price||0), quantity: 0, amount: 0 }
-            map[key].quantity += Number(item.quantity || 0)
-            map[key].amount += Number(item.amount || 0)
-          }
-        }
-      }
-    }
-    if (Object.keys(map).length > 0) {
-      selectedUserItems.value = Object.values(map)
-    } else {
-      // 无销售记录，展示该商家商品列表
-      selectedUserItems.value = products.value.filter((p: any) => p.merchantId === row.id).map((p: any) => ({
-        productName: p.name, price: p.price, quantity: 0, amount: 0,
-      }))
-    }
-  } else {
-    selectedUserItems.value = (orderStats.value.userOrders?.[uid] || []) as any[]
-  }
-}
+const merchantChartType = ref('bar')
+const selectedMerchant = ref<number | null>(null)
+const selectedMerchantSales = ref(0)
 
 function sType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : s === 'COMPLETED' ? 'success' : 'danger' }
 
@@ -172,6 +99,18 @@ const statCards = computed(() => [
 
 const recentOrders = computed(() => orderStats.value.recentOrders || [])
 
+const statusChartOption = computed(() => ({
+  tooltip: { trigger: 'axis' },
+  grid: { left: 60, right: 20, top: 30, bottom: 30 },
+  xAxis: { type: 'category', data: Object.keys(orderStats.value.byStatus || {}).map(k => statusNames[k]||k), axisLabel: { color: '#94a3b8', fontSize: 11 } },
+  yAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
+  series: [{
+    type: 'bar', data: Object.values(orderStats.value.byStatus || {}),
+    itemStyle: { color: '#00c6f2', borderRadius: [4,4,0,0] }, barWidth: 32,
+    label: { show: true, position: 'top', color: '#94a3b8', fontSize: 11 },
+  }],
+}))
+
 const pieChartOption = computed(() => ({
   tooltip: { trigger: 'item', formatter: '{b}: {c}单 ({d}%)' },
   legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 11 } },
@@ -188,7 +127,7 @@ const merchantChartOption = computed(() => {
   const map = orderStats.value.byMerchant || {}
   const labels = Object.keys(map).map(k => merchantNames[Number(k)] || `商家#${k}`)
   const values: number[] = Object.values(map).map((v:any) => Number(v))
-  const isBar = detailChartType.value === 'bar'
+  const isBar = merchantChartType.value === 'bar'
   const base = {
     tooltip: { trigger: isBar ? 'axis' : 'item', formatter: isBar ? undefined : '{b}: ¥{c} ({d}%)' },
     grid: isBar ? { left: 100, right: 40, top: 30, bottom: 30 } : undefined,
@@ -204,31 +143,15 @@ const merchantChartOption = computed(() => {
     avoidLabelOverlap: false,
   }]
   if (isBar) {
-    return { ...base, xAxis: { type: 'value', axisLabel: { color: '#94a3b8' } }, yAxis: { type: 'category', data: labels, axisLabel: { color: '#94a3b8', fontSize: 11 } }, series, color: ['#f59e0b','#00c6f2','#22c55e'] }
-  }
-  return { ...base, series, legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 11 } }, color: ['#f59e0b','#00c6f2','#22c55e'] }
-})
-
-const userDetailChartOption = computed(() => {
-  const items = selectedUserItems.value
-  const labels = items.map((i:any) => i.productName || i.orderNo || '—')
-  const values = items.map((i:any) => Number(i.amount || 0))
-  const isBar = detailChartType.value === 'bar'
-  if (isBar) {
     return {
-      tooltip: { trigger: 'axis' },
-      grid: { left: 120, right: 40, top: 20, bottom: 30 },
+      ...base,
       xAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
       yAxis: { type: 'category', data: labels, axisLabel: { color: '#94a3b8', fontSize: 11 } },
-      series: [{ type: 'bar', data: values, itemStyle: { color: '#00c6f2', borderRadius: [0,4,4,0] }, barWidth: 20, label: { show: true, position: 'right', color: '#94a3b8', fontSize: 10 } }],
+      series,
+      color: ['#f59e0b','#00c6f2','#22c55e'],
     }
   }
-  return {
-    tooltip: { trigger: 'item', formatter: '{b}: ¥{c} ({d}%)' },
-    legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 10 } },
-    series: [{ type: 'pie', radius: ['45%','72%'], center: ['50%','50%'], avoidLabelOverlap: false, label: { show: true, formatter: '{d}%', color: '#94a3b8', fontSize: 10 }, itemStyle: { borderRadius: 4, borderColor: '#0b111e', borderWidth: 2 }, data: labels.map((n,i) => ({ name: n, value: values[i] })) }],
-    color: ['#f59e0b','#00c6f2','#3b82f6','#22c55e','#a855f7','#f43f5e'],
-  }
+  return { ...base, series, legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 11 } }, color: ['#f59e0b','#00c6f2','#22c55e'] }
 })
 
 const rolePieOption = computed(() => {
@@ -249,13 +172,24 @@ const rolePieOption = computed(() => {
 })
 
 onMounted(async () => {
-  // 独立请求，避免一个失败影响全部
-  try { const r: any = await request.get('/order/stats'); orderStats.value = r.data || {} } catch {}
-  try { const r: any = await request.get('/user/list', { params: { page:1, size:1 } }); userCount.value = r.data?.total || 0 } catch {}
-  try { const r: any = await request.get('/product/list', { params: { page:1, size:1, includeOffShelf:true } }); productCount.value = r.data?.total || 0 } catch {}
-  try { const r: any = await request.get('/user/list', { params: { page:1, size:100 } }); users.value = r.data?.records || [] } catch {}
-  try { const r: any = await request.get('/product/list', { params: { page:1, size:100, includeOffShelf:true } }); products.value = r.data?.records || [] } catch {}
+  const [orderRes, userRes, productRes] = await Promise.all([
+    request.get('/order/stats'),
+    request.get('/user/list', { params: { page:1, size:1 } }),
+    request.get('/product/list', { params: { page:1, size:1, includeOffShelf: true } }),
+  ])
+  orderStats.value = orderRes.data || {}
+  userCount.value = userRes.data?.total || 0
+  productCount.value = productRes.data?.total || 0
 
+  // 获取全量数据用于图表
+  const [allUsers, allProducts] = await Promise.all([
+    request.get('/user/list', { params: { page:1, size:100 } }),
+    request.get('/product/list', { params: { page:1, size:100, includeOffShelf: true } }),
+  ])
+  users.value = allUsers.data?.records || []
+  products.value = allProducts.data?.records || []
+
+  // 获取商家名称
   for (const u of users.value) {
     if (u.role === 'MERCHANT') {
       merchantNames[u.id] = u.nickname || u.username
@@ -282,8 +216,5 @@ onMounted(async () => {
 .chart-toggle { font-size: 0.75rem; color: var(--accent-cyan); cursor: pointer; user-select: none; }
 .chart-toggle:hover { opacity: 0.8; }
 .merchant-detail { font-size: 0.8rem; color: var(--text-secondary); margin-top: var(--space-sm); }
-.user-name-cell { font-weight: 600; cursor: pointer; }
-.user-detail { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-subtle); }
-.detail-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); font-size: 0.85rem; font-weight: 600; }
 @media (max-width: 768px) { .stat-cards { grid-template-columns: repeat(2,1fr); } .chart-row { grid-template-columns: 1fr; } }
 </style>
