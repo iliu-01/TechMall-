@@ -37,6 +37,9 @@ a:hover { opacity: 0.85; }
 .glass { background: var(--bg-glass); backdrop-filter: blur(20px) saturate(180%); }
 .card  { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
 
+/* 登录页也撑满 */
+.login-page { min-height: 100vh; display: flex; flex-direction: column; }
+
 /* 返回链接 */
 .back-link {
   display: inline-block; color: var(--text-muted); font-size: 0.85rem;
@@ -79,6 +82,9 @@ a:hover { opacity: 0.85; }
 
 /* Element Plus 消息通知下移，避免遮挡顶部导航 */
 .el-message { top: 72px !important; }
+
+/* 页面根容器：粘性页脚 */
+.page-root { min-height: 100vh; display: flex; flex-direction: column; }
 
 /* 页面容器 */
 .page-container { max-width: 1320px; margin: 0 auto; padding: 0 var(--space-lg) var(--space-3xl); }

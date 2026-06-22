@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-root">
     <AppHeader />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-root">
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <h2 class="section-title">🛒 购物车</h2>

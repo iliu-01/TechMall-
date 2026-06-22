@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-root">
     <AppHeader />
     <div class="page-container" style="margin-top: var(--space-xl); max-width: 640px">
       <h2 class="section-title">📦 添加商品</h2>
