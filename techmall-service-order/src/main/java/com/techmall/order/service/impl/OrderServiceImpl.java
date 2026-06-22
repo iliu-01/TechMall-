@@ -245,6 +245,17 @@ public class OrderServiceImpl implements OrderService {
             byStatus.put(s, count);
         }
 
+        // 各商家销售额（从 order_item 按 merchant_id 聚合）
+        Map<Long, BigDecimal> byMerchant = new LinkedHashMap<>();
+        for (Order o : all) {
+            if (!"CANCELLED".equals(o.getStatus())) {
+                List<OrderItem> items = orderItemMapper.selectByOrderId(o.getId());
+                for (OrderItem item : items) {
+                    byMerchant.merge(item.getMerchantId(), item.getAmount(), BigDecimal::add);
+                }
+            }
+        }
+
         // 最近订单
         List<Order> recent = all.stream()
                 .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
@@ -254,6 +265,7 @@ public class OrderServiceImpl implements OrderService {
         stats.put("totalOrders", totalOrders);
         stats.put("totalSales", totalSales);
         stats.put("byStatus", byStatus);
+        stats.put("byMerchant", byMerchant);
         stats.put("recentOrders", recent);
         return Result.success(stats);
     }
