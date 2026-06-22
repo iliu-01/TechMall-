@@ -126,32 +126,33 @@ function selectUser(row: any) {
   selectedUserName.value = row.nickname || row.username
   selectedUserRole.value = row.role
   const uid = String(row.id)
-  const orders = (orderStats.value.userOrders?.[uid] || []) as any[]
 
   if (row.role === 'MERCHANT') {
-    // 优先用订单数据，无订单则用商品列表
-    if (orders.length > 0) {
-      const map: Record<number,any> = {}
-      for (const o of orders) {
+    // 遍历所有用户的订单，筛选该商家的商品
+    const allOrders: Record<string,any[]> = orderStats.value.userOrders || {}
+    const map: Record<number,any> = {}
+    for (const uidKey of Object.keys(allOrders)) {
+      for (const o of (allOrders[uidKey] || [])) {
         for (const item of (o.items || [])) {
           if (Number(item.merchantId) === Number(row.id)) {
             const key = item.productId
-            if (!map[key]) map[key] = { productName: item.productName, price: Number(item.price), quantity: 0, amount: 0 }
+            if (!map[key]) map[key] = { productName: item.productName, price: Number(item.price||0), quantity: 0, amount: 0 }
             map[key].quantity += Number(item.quantity || 0)
             map[key].amount += Number(item.amount || 0)
           }
         }
       }
+    }
+    if (Object.keys(map).length > 0) {
       selectedUserItems.value = Object.values(map)
     } else {
-      // 兜底：从商品列表展示该商家所有商品（价格为0表示无销售）
-      const allMerchantProducts = products.value.filter((p: any) => p.merchantId === row.id)
-      selectedUserItems.value = allMerchantProducts.map((p: any) => ({
+      // 无销售记录，展示该商家商品列表
+      selectedUserItems.value = products.value.filter((p: any) => p.merchantId === row.id).map((p: any) => ({
         productName: p.name, price: p.price, quantity: 0, amount: 0,
       }))
     }
   } else {
-    selectedUserItems.value = orders
+    selectedUserItems.value = (orderStats.value.userOrders?.[uid] || []) as any[]
   }
 }
 
