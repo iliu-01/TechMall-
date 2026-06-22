@@ -112,9 +112,9 @@ onMounted(async () => {
   await fetchShopName()
 })
 
-// 仅当跳转商品详情时保存搜索状态
+// 仅当跳转商品详情且当前不是店铺页时保存搜索状态
 onBeforeRouteLeave((to) => {
-  if (to.path.startsWith('/product/')) {
+  if (to.path.startsWith('/product/') && !route.query.merchantId) {
     sessionStorage.setItem('lastSearch', JSON.stringify(route.query))
   }
 })
