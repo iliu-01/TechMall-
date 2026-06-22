@@ -23,7 +23,7 @@
             <el-input v-model="userFilter" placeholder="搜索名称…" size="small" style="width:180px" clearable />
           </div>
           <div class="table-wrap" style="margin-top:var(--space-sm)">
-          <el-table :data="filteredUsers" @row-click="selectUser" max-height="260">
+          <el-table :data="filteredUsers" highlight-current-row @row-click="selectUser" max-height="260">
             <el-table-column label="名称"><template #default="{row}"><span class="user-name-cell">{{ row.nickname || row.username }}</span></template></el-table-column>
             <el-table-column label="角色" width="70"><template #default="{row}"><el-tag :type="row.role==='MERCHANT'?'warning':'info'" size="small">{{ row.role==='MERCHANT'?'商家':'用户' }}</el-tag></template></el-table-column>
             <el-table-column label="金额" width="120" align="right"><template #default="{row}"><span class="price-cell">¥{{ amountFor(row).toLocaleString() }}</span></template></el-table-column>
@@ -272,6 +272,7 @@ onMounted(async () => {
 .detail-close:hover { opacity: 0.8; }
 .user-name-cell { cursor: pointer; }
 .table-wrap :deep(.el-table__body tr) { cursor: pointer; }
+.table-wrap :deep(.el-table__body tr.current-row td) { background: rgba(0,198,242,0.08) !important; }
 .user-detail { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-subtle); }
 .detail-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); font-size: 0.85rem; font-weight: 600; }
 @media (max-width: 768px) { .stat-cards { grid-template-columns: repeat(2,1fr); } .chart-row { grid-template-columns: 1fr; } }
