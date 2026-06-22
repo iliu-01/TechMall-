@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <h2 class="section-title">📋 我的订单</h2>

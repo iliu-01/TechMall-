@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)" v-if="detail">
       <h2 class="section-title">📋 订单详情 — {{ detail.order.orderNo }}</h2>

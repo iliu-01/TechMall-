@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl); max-width: 560px">
       <router-link to="/home" class="back-link">← 返回首页</router-link>

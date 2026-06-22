@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader @toggleCart="showCart = true" />
 
     <!-- Hero Banner Carousel -->

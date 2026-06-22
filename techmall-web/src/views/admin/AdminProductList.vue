@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <h2 class="section-title">📦 全站商品管理</h2>

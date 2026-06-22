@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader />
     <div class="page-container" style="margin-top: var(--space-xl); max-width: 640px">
       <h2 class="section-title">✏️ 编辑商品</h2>

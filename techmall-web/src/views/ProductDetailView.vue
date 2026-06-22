@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader @toggleCart="showCart = true" />
     <div class="page-container" style="margin-top: var(--space-xl)" v-if="product">
       <router-link v-if="backSearch" :to="backSearch" class="back-link">← 返回搜索结果</router-link>

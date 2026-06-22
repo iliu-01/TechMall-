@@ -1,5 +1,5 @@
 <template>
-  <div class="page-root">
+  <div>
     <AppHeader />
     <div class="page-container" style="margin-top: var(--space-xl)">
       <router-link to="/admin/users" class="back-link">← 返回用户管理</router-link>
