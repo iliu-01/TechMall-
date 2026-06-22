@@ -36,14 +36,14 @@
             <span class="nav-balance">¥{{ Number(userStore.userInfo?.balance || 0).toLocaleString() }}</span>
           </span>
           <span v-if="userStore.role === 'ADMIN'" class="nav-role role-admin">管理员</span>
-          <el-popover v-if="userStore.role !== 'ADMIN'" placement="bottom" :width="280" trigger="click">
+          <el-popover v-if="userStore.role !== 'ADMIN'" placement="bottom" :width="280" trigger="hover" :hide-after="100">
             <template #reference>
               <span class="bell-btn">
                 🔔<span v-if="notifyCount" class="bell-badge">{{ notifyCount }}</span>
               </span>
             </template>
             <div v-if="notifications.length" class="notify-list">
-              <div v-for="n in notifications" :key="n.id" class="notify-item" @click.stop="dismissNotify(n)">
+              <div v-for="n in notifications" :key="n.id" class="notify-item" @click="dismissNotify(n)">
                 <span class="notify-icon">{{ n.icon }}</span>
                 <div class="notify-text">
                   <div>{{ n.text }}</div>
