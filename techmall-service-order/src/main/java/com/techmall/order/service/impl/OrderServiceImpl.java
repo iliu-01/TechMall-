@@ -227,36 +227,59 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Result<?> getStats() {
-        // 查询所有订单聚合统计
         List<Order> all = orderMapper.selectAll(null, null);
         Map<String, Object> stats = new HashMap<>();
 
-        // 总数 + 总额
         long totalOrders = all.size();
         BigDecimal totalSales = all.stream()
                 .filter(o -> !"CANCELLED".equals(o.getStatus()))
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // 按状态分组
         Map<String, Long> byStatus = new LinkedHashMap<>();
         for (String s : VALID_STATUSES) {
             long count = all.stream().filter(o -> s.equals(o.getStatus())).count();
             byStatus.put(s, count);
         }
 
-        // 各商家销售额（从 order_item 按 merchant_id 聚合）
         Map<Long, BigDecimal> byMerchant = new LinkedHashMap<>();
+        // 每个用户的消费/销售额
+        Map<Long, BigDecimal> byUser = new LinkedHashMap<>();
+        // 每个用户的订单列表
+        Map<Long, java.util.List<Map<String, Object>>> userOrders = new LinkedHashMap<>();
+
         for (Order o : all) {
             if (!"CANCELLED".equals(o.getStatus())) {
+                byUser.merge(o.getUserId(), o.getTotalAmount(), BigDecimal::add);
+
                 List<OrderItem> items = orderItemMapper.selectByOrderId(o.getId());
                 for (OrderItem item : items) {
                     byMerchant.merge(item.getMerchantId(), item.getAmount(), BigDecimal::add);
                 }
+
+                // 保存用户订单摘要
+                Map<String, Object> orderSummary = new HashMap<>();
+                orderSummary.put("orderId", o.getId());
+                orderSummary.put("orderNo", o.getOrderNo());
+                orderSummary.put("amount", o.getTotalAmount());
+                orderSummary.put("status", o.getStatus());
+                orderSummary.put("time", o.getCreatedAt());
+                java.util.List<Map<String, Object>> itemsList = new java.util.ArrayList<>();
+                for (OrderItem item : items) {
+                    Map<String, Object> is = new HashMap<>();
+                    is.put("productId", item.getProductId());
+                    is.put("productName", item.getProductName());
+                    is.put("price", item.getProductPrice());
+                    is.put("quantity", item.getQuantity());
+                    is.put("amount", item.getAmount());
+                    is.put("merchantId", item.getMerchantId());
+                    itemsList.add(is);
+                }
+                orderSummary.put("items", itemsList);
+                userOrders.computeIfAbsent(o.getUserId(), k -> new java.util.ArrayList<>()).add(orderSummary);
             }
         }
 
-        // 最近订单
         List<Order> recent = all.stream()
                 .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
                 .limit(5)
@@ -266,6 +289,8 @@ public class OrderServiceImpl implements OrderService {
         stats.put("totalSales", totalSales);
         stats.put("byStatus", byStatus);
         stats.put("byMerchant", byMerchant);
+        stats.put("byUser", byUser);
+        stats.put("userOrders", userOrders);
         stats.put("recentOrders", recent);
         return Result.success(stats);
     }

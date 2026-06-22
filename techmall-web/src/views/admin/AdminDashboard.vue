@@ -15,11 +15,38 @@
         </div>
       </div>
 
-      <!-- 图表行 -->
+      <!-- 用户消费表 + 订单状态饼图 -->
       <div class="chart-row">
-        <div class="chart-box">
-          <h4>📈 销售额分布（按订单状态）</h4>
-          <v-chart :option="statusChartOption" style="height:320px" autoresize />
+        <div class="chart-box" style="overflow:auto">
+          <div class="chart-header">
+            <h4>🧑‍💼 用户消费 / 商家销售</h4>
+            <el-input v-model="userFilter" placeholder="搜索用户名…" size="small" style="width:180px" clearable />
+          </div>
+          <el-table :data="filteredUsers" style="width:100%;min-width:400px" highlight-current-row @row-click="selectUser" max-height="260">
+            <el-table-column prop="nickname" label="名称" min-width="120"><template #default="{row}"><span class="user-name-cell">{{ row.nickname || row.username }}</span></template></el-table-column>
+            <el-table-column prop="role" label="角色" width="80" align="center"><template #default="{row}"><el-tag :type="row.role==='MERCHANT'?'warning':'info'" size="small">{{ row.role==='MERCHANT'?'商家':'用户' }}</el-tag></template></el-table-column>
+            <el-table-column label="金额" width="140" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(userSpending[row.id]||0).toLocaleString() }}</span></template></el-table-column>
+          </el-table>
+          <!-- 选中用户详情 -->
+          <div v-if="selectedUserId" class="user-detail">
+            <div class="detail-bar">
+              <span>{{ selectedUserName }} 的{{ selectedUserRole==='MERCHANT' ? '商品销售' : '消费记录' }}</span>
+              <a @click="selectedUserId=null" style="color:var(--accent-cyan);cursor:pointer">✕ 关闭</a>
+            </div>
+            <el-table :data="selectedUserItems" style="width:100%;min-width:350px" size="small" max-height="220">
+              <template v-if="selectedUserRole==='MERCHANT'">
+                <el-table-column prop="productName" label="商品" min-width="140" />
+                <el-table-column prop="price" label="单价" width="90" align="right"><template #default="{row}">¥{{ Number(row.price).toLocaleString() }}</template></el-table-column>
+                <el-table-column prop="quantity" label="数量" width="60" align="center" />
+                <el-table-column prop="amount" label="小计" width="100" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(row.amount).toLocaleString() }}</span></template></el-table-column>
+              </template>
+              <template v-else>
+                <el-table-column prop="orderNo" label="订单号" width="180" />
+                <el-table-column prop="amount" label="金额" width="100" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(row.amount).toLocaleString() }}</span></template></el-table-column>
+                <el-table-column label="包含商品" min-width="180"><template #default="{row}">{{ row.items?.map((i:any)=>i.productName).join('、') }}</template></el-table-column>
+              </template>
+            </el-table>
+          </div>
         </div>
         <div class="chart-box">
           <h4>📊 订单状态分布</h4>
@@ -74,7 +101,7 @@ import AppFooter from '@/components/AppFooter.vue'
 
 use([BarChart, PieChart, GridComponent, TooltipComponent, LegendComponent, TitleComponent, CanvasRenderer])
 
-const orderStats = ref<any>({ byStatus: {}, recentOrders: [], byMerchant: {} })
+const orderStats = ref<any>({ byStatus: {}, recentOrders: [], byMerchant: {}, byUser: {}, userOrders: {} })
 const userCount = ref(0)
 const productCount = ref(0)
 const users = ref<any[]>([])
@@ -82,6 +109,46 @@ const products = ref<any[]>([])
 const merchantChartType = ref('bar')
 const selectedMerchant = ref<number | null>(null)
 const selectedMerchantSales = ref(0)
+
+// 用户表逻辑
+const userFilter = ref('')
+const selectedUserId = ref<number | null>(null)
+const selectedUserName = ref('')
+const selectedUserRole = ref('')
+const userSpending = ref<Record<number,number>>({})
+const selectedUserItems = ref<any[]>([])
+
+const filteredUsers = computed(() => {
+  const term = userFilter.value.toLowerCase()
+  return users.value.filter((u:any)=> {
+    if (u.role === 'ADMIN') return false
+    return (u.nickname||u.username||'').toLowerCase().includes(term)
+  })
+})
+
+function selectUser(row: any) {
+  selectedUserId.value = row.id
+  selectedUserName.value = row.nickname || row.username
+  selectedUserRole.value = row.role
+  const orders = orderStats.value.userOrders?.[row.id] || []
+  if (row.role === 'MERCHANT') {
+    // 聚合该商家的所有商品
+    const map: Record<number,any> = {}
+    for (const o of orders) {
+      for (const item of (o.items || [])) {
+        if (Number(item.merchantId) === Number(row.id)) {
+          const key = item.productId
+          if (!map[key]) map[key] = { productName: item.productName, price: item.price, quantity: 0, amount: 0 }
+          map[key].quantity += item.quantity
+          map[key].amount += item.amount
+        }
+      }
+    }
+    selectedUserItems.value = Object.values(map)
+  } else {
+    selectedUserItems.value = orders
+  }
+}
 
 function sType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : s === 'COMPLETED' ? 'success' : 'danger' }
 
@@ -98,18 +165,6 @@ const statCards = computed(() => [
 ])
 
 const recentOrders = computed(() => orderStats.value.recentOrders || [])
-
-const statusChartOption = computed(() => ({
-  tooltip: { trigger: 'axis' },
-  grid: { left: 60, right: 20, top: 30, bottom: 30 },
-  xAxis: { type: 'category', data: Object.keys(orderStats.value.byStatus || {}).map(k => statusNames[k]||k), axisLabel: { color: '#94a3b8', fontSize: 11 } },
-  yAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
-  series: [{
-    type: 'bar', data: Object.values(orderStats.value.byStatus || {}),
-    itemStyle: { color: '#00c6f2', borderRadius: [4,4,0,0] }, barWidth: 32,
-    label: { show: true, position: 'top', color: '#94a3b8', fontSize: 11 },
-  }],
-}))
 
 const pieChartOption = computed(() => ({
   tooltip: { trigger: 'item', formatter: '{b}: {c}单 ({d}%)' },
@@ -180,8 +235,8 @@ onMounted(async () => {
   orderStats.value = orderRes.data || {}
   userCount.value = userRes.data?.total || 0
   productCount.value = productRes.data?.total || 0
+  userSpending.value = orderRes.data?.byUser || {}
 
-  // 获取全量数据用于图表
   const [allUsers, allProducts] = await Promise.all([
     request.get('/user/list', { params: { page:1, size:100 } }),
     request.get('/product/list', { params: { page:1, size:100, includeOffShelf: true } }),
@@ -189,7 +244,6 @@ onMounted(async () => {
   users.value = allUsers.data?.records || []
   products.value = allProducts.data?.records || []
 
-  // 获取商家名称
   for (const u of users.value) {
     if (u.role === 'MERCHANT') {
       merchantNames[u.id] = u.nickname || u.username
@@ -216,5 +270,8 @@ onMounted(async () => {
 .chart-toggle { font-size: 0.75rem; color: var(--accent-cyan); cursor: pointer; user-select: none; }
 .chart-toggle:hover { opacity: 0.8; }
 .merchant-detail { font-size: 0.8rem; color: var(--text-secondary); margin-top: var(--space-sm); }
+.user-name-cell { font-weight: 600; cursor: pointer; }
+.user-detail { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-subtle); }
+.detail-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); font-size: 0.85rem; font-weight: 600; }
 @media (max-width: 768px) { .stat-cards { grid-template-columns: repeat(2,1fr); } .chart-row { grid-template-columns: 1fr; } }
 </style>
