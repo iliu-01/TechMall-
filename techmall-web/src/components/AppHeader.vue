@@ -36,23 +36,23 @@
             <span class="nav-balance">¥{{ Number(userStore.userInfo?.balance || 0).toLocaleString() }}</span>
           </span>
           <span v-if="userStore.role === 'ADMIN'" class="nav-role role-admin">管理员</span>
-          <el-popover v-if="userStore.role !== 'ADMIN'" placement="bottom" :width="280" trigger="hover" :hide-after="100">
-            <template #reference>
-              <span class="bell-btn">
-                🔔<span v-if="notifyCount" class="bell-badge">{{ notifyCount }}</span>
-              </span>
-            </template>
-            <div v-if="notifications.length" class="notify-list">
-              <div v-for="n in notifications" :key="n.id" class="notify-item" @click="dismissNotify(n)">
-                <span class="notify-icon">{{ n.icon }}</span>
-                <div class="notify-text">
-                  <div>{{ n.text }}</div>
-                  <div class="notify-time">{{ n.time }}</div>
+          <div v-if="userStore.role !== 'ADMIN'" class="bell-wrap">
+            <span class="bell-btn" @click="showNotify = !showNotify">
+              🔔<span v-if="notifyCount" class="bell-badge">{{ notifyCount }}</span>
+            </span>
+            <div v-show="showNotify" class="notify-drop">
+              <div v-if="notifications.length" class="notify-list">
+                <div v-for="n in notifications" :key="n.id" class="notify-item" @click="dismissNotify(n)">
+                  <span class="notify-icon">{{ n.icon }}</span>
+                  <div class="notify-text">
+                    <div>{{ n.text }}</div>
+                    <div class="notify-time">{{ n.time }}</div>
+                  </div>
                 </div>
               </div>
+              <div v-else style="text-align:center;color:var(--text-muted);padding:12px">暂无新消息</div>
             </div>
-            <div v-else style="text-align:center;color:var(--text-muted);padding:12px">暂无新消息</div>
-          </el-popover>
+          </div>
           <el-dropdown>
             <span class="user-avatar-wrap">
               <span class="user-avatar">👤</span>
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
@@ -111,6 +111,7 @@ function goHome() {
 }
 
 // 消息通知
+const showNotify = ref(false)
 const notifications = ref<any[]>(JSON.parse(sessionStorage.getItem('notify') || '[]'))
 const notifyCount = computed(() => notifications.value.length)
 
@@ -137,10 +138,17 @@ async function loadNotifications() {
 function dismissNotify(n: any) {
   notifications.value = notifications.value.filter(x => x.id !== n.id)
   sessionStorage.setItem('notify', JSON.stringify(notifications.value))
+  showNotify.value = false
   router.push(`/orders/${n.orderId}`)
 }
 
-onMounted(() => { loadNotifications() })
+function closeNotify(e: MouseEvent) {
+  const t = e.target as HTMLElement
+  if (!t.closest('.bell-wrap')) showNotify.value = false
+}
+
+onMounted(() => { loadNotifications(); document.addEventListener('click', closeNotify) })
+onUnmounted(() => { document.removeEventListener('click', closeNotify) })
 
 function search() {
   const term = keyword.value.trim()
@@ -222,11 +230,18 @@ function search() {
 .user-avatar { cursor: pointer; font-size: 1rem; }
 .login-btn { font-size: 0.85rem; color: var(--accent-cyan); font-weight: 500; text-decoration: none; }
 
+.bell-wrap { position: relative; }
 .bell-btn {
   position: relative; cursor: pointer; font-size: 1.1rem; color: var(--text-secondary);
   padding: 4px; transition: color var(--duration-fast);
 }
 .bell-btn:hover { color: var(--accent-cyan); }
+.notify-drop {
+  position: absolute; top: 38px; right: 0; z-index: 300;
+  width: 280px; background: var(--bg-primary);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated); padding: 6px;
+}
 .bell-badge {
   position: absolute; top: -2px; right: -4px;
   width: 16px; height: 16px; background: var(--accent-rose);
