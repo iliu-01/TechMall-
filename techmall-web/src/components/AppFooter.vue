@@ -34,7 +34,7 @@
 </template>
 
 <style scoped>
-.site-footer { margin-top: auto; border-top: 1px solid var(--border-subtle); background: var(--bg-primary); }
+.site-footer { margin-top: var(--space-3xl); border-top: 1px solid var(--border-subtle); background: var(--bg-primary); }
 .footer-inner { max-width: 1320px; margin: 0 auto; padding: var(--space-2xl) var(--space-lg) var(--space-lg); }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--space-2xl); }
 .logo-text { font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; display: inline-flex; align-items: center; gap: 8px; margin-bottom: var(--space-md); }
