@@ -36,7 +36,7 @@
     <section class="page-container" style="margin-top: var(--space-3xl)">
       <div class="section-header">
         <h2 class="section-title">🔭 按品类探索</h2>
-        <router-link to="/products" class="section-link">全部分类 →</router-link>
+        <router-link to="/products" class="section-link">查看全部商品 →</router-link>
       </div>
       <div class="category-scroll">
         <div v-for="c in categories" :key="c.name" class="cat-card" @click="$router.push({path:'/products', query:{categoryId: c.id}})">
