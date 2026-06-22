@@ -138,6 +138,7 @@ npm run dev
 
 | 功能 | 路径 | 说明 |
 |------|------|------|
+| 📊 数据概览 | `/admin/dashboard` | 统计卡片 + 用户消费表 + 热销排行 + 图表（ECharts）|
 | 用户管理 | `/admin/users` | 启用/禁用、查看用户订单/商家商品 |
 | 全站商品 | `/admin/products` | 上架/下架 |
 | 全站订单 | `/admin/orders` | 查看所有订单 |
