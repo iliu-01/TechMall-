@@ -1,0 +1,22 @@
+# ============================================================
+# Nacos 配置 — techmall-product-service
+# Data ID: techmall-product-service.yml
+# Group:   DEFAULT_GROUP
+# 格式:    YAML
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/techmall_product?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.techmall.product.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.techmall.product.mapper: debug

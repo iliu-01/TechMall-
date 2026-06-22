@@ -1,0 +1,23 @@
+# ============================================================
+# Nacos 配置 — techmall-user-service
+# 上传路径: Nacos 控制台 → 配置管理 → 配置列表 → +
+# Data ID: techmall-user-service.yml
+# Group:   DEFAULT_GROUP
+# 格式:    YAML
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/techmall_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.techmall.user.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.techmall.user.mapper: debug
