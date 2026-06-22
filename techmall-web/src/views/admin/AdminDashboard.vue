@@ -171,7 +171,6 @@ const pieChartOption = computed(() => ({
 }))
 
 const topProductsOption = computed(() => {
-  // 从所有订单聚合各商品总销量
   const all = orderStats.value.userOrders || {}
   const agg: Record<string,{name:string,qty:number;amount:number}> = {}
   for (const key of Object.keys(all)) {
@@ -184,13 +183,20 @@ const topProductsOption = computed(() => {
       }
     }
   }
-  const sorted = Object.values(agg).sort((a,b) => b.amount - a.amount).slice(0, 8)
+  const sorted = Object.values(agg).sort((a,b) => b.amount - a.amount).slice(0, 8).reverse()
   return {
-    tooltip: { trigger: 'axis', formatter: (p:any) => `${p[0].name}<br/>销量: ${agg[p[0].name]?.qty} | 销售额: ¥${p[0].value.toLocaleString()}` },
-    grid: { left: 120, right: 40, top: 10, bottom: 20 },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (p:any) => {
+        const d = sorted.find((s:any) => (s.name.length > 12 ? s.name.slice(0,12)+'…' : s.name) === p[0].name)
+        const full = d || sorted[p[0].dataIndex]
+        return `<b>${full?.name || p[0].name}</b><br/>销量: ${full?.qty || 0} 件 | 销售额: ¥${(full?.amount || 0).toLocaleString()}`
+      }
+    },
+    grid: { left: 130, right: 60, top: 10, bottom: 20 },
     xAxis: { type: 'value', axisLabel: { color: '#94a3b8', fontSize: 10 } },
-    yAxis: { type: 'category', data: sorted.map(s => s.name.length > 12 ? s.name.slice(0,12)+'…' : s.name).reverse(), axisLabel: { color: '#94a3b8', fontSize: 10 }, inverse: true },
-    series: [{ type: 'bar', data: sorted.map(s => s.amount).reverse(), itemStyle: { color: '#00c6f2', borderRadius: [0,4,4,0] }, barWidth: 18, label: { show: true, position: 'right', color: '#94a3b8', fontSize: 10, formatter: (p:any) => '¥'+Number(p.value).toLocaleString() } }],
+    yAxis: { type: 'category', data: sorted.map(s => s.name.length > 12 ? s.name.slice(0,12)+'…' : s.name), axisLabel: { color: '#94a3b8', fontSize: 10 } },
+    series: [{ type: 'bar', data: sorted.map(s => s.amount), itemStyle: { color: '#00c6f2', borderRadius: [0,4,4,0] }, barWidth: 18, label: { show: true, position: 'right', color: '#94a3b8', fontSize: 10, formatter: (p:any) => '¥'+Number(p.value).toLocaleString() } }],
   }
 })
 
