@@ -6,13 +6,13 @@
       <h2 class="section-title">📋 {{ targetName }} 的订单</h2>
       <div class="table-wrap">
         <el-table :data="orders" v-loading="loading">
-          <el-table-column prop="orderNo" label="订单号" width="220" />
-          <el-table-column label="金额" width="120"><template #default="{row}"><span class="price-cell">¥{{ Number(row.totalAmount).toLocaleString() }}</span></template></el-table-column>
-          <el-table-column prop="status" label="状态" width="110" align="center">
+          <el-table-column prop="orderNo" label="订单号" />
+          <el-table-column label="金额"><template #default="{row}"><span class="price-cell">¥{{ Number(row.totalAmount).toLocaleString() }}</span></template></el-table-column>
+          <el-table-column prop="status" label="状态">
             <template #default="{row}"><el-tag :type="statusType(row.status)" size="small">{{ row.status }}</el-tag></template>
           </el-table-column>
-          <el-table-column prop="receiverName" label="收货人" width="100" />
-          <el-table-column label="操作" align="center">
+          <el-table-column prop="receiverName" label="收货人" />
+          <el-table-column label="操作">
             <template #default="{row}">
               <el-button size="small" text @click="$router.push(`/orders/${row.id}`)">详情</el-button>
               <el-button v-if="row.status === 'PENDING'" size="small" text type="danger" @click="cancel(row.id)">取消</el-button>

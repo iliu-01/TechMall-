@@ -5,13 +5,13 @@
       <h2 class="section-title">📦 本店订单</h2>
         <div class="table-wrap">
         <el-table :data="orders" v-loading="loading">
-        <el-table-column prop="orderNo" label="订单号" width="200" />
-        <el-table-column prop="totalAmount" label="金额" width="120"><template #default="{row}">¥{{ row.totalAmount }}</template></el-table-column>
-        <el-table-column prop="status" label="状态" width="120">
+        <el-table-column prop="orderNo" label="订单号" />
+        <el-table-column prop="totalAmount" label="金额"><template #default="{row}">¥{{ row.totalAmount }}</template></el-table-column>
+        <el-table-column prop="status" label="状态">
           <template #default="{row}"><el-tag :type="statusType(row.status)">{{ row.status }}</el-tag></template>
         </el-table-column>
-        <el-table-column prop="receiverName" label="收货人" min-width="140" />
-        <el-table-column label="操作" width="120" align="center">
+        <el-table-column prop="receiverName" label="收货人" />
+        <el-table-column label="操作">
           <template #default="{row}">
             <el-button size="small" @click="$router.push(`/orders/${row.id}`)">详情</el-button>
             <el-button v-if="row.status === 'PAID'" size="small" type="primary" @click="ship(row.id)">发货</el-button>

@@ -5,12 +5,12 @@
       <h2 class="section-title">👥 用户管理</h2>
         <div class="table-wrap">
         <el-table :data="users" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="60" />
-        <el-table-column prop="username" label="用户名" width="100" />
-        <el-table-column prop="nickname" label="昵称" min-width="140" />
-        <el-table-column prop="role" label="角色" width="100"><template #default="{row}"><el-tag>{{ row.role }}</el-tag></template></el-table-column>
-        <el-table-column prop="status" label="状态" width="80"><template #default="{row}"><el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '正常' : '禁用' }}</el-tag></template></el-table-column>
-        <el-table-column label="管理" width="240" align="center">
+        <el-table-column prop="id" label="ID" />
+        <el-table-column prop="username" label="用户名" />
+        <el-table-column prop="nickname" label="昵称" />
+        <el-table-column prop="role" label="角色"><template #default="{row}"><el-tag>{{ row.role }}</el-tag></template></el-table-column>
+        <el-table-column prop="status" label="状态"><template #default="{row}"><el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '正常' : '禁用' }}</el-tag></template></el-table-column>
+        <el-table-column label="管理">
           <template #default="{row}">
             <el-button size="small" text type="primary"
               v-if="row.role === 'USER'"
