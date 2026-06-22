@@ -112,9 +112,11 @@ onMounted(async () => {
   await fetchShopName()
 })
 
-// 离开时保存搜索状态（供商品详情页返回使用）
-onBeforeRouteLeave(() => {
-  sessionStorage.setItem('lastSearch', JSON.stringify(route.query))
+// 仅当跳转商品详情时保存搜索状态
+onBeforeRouteLeave((to) => {
+  if (to.path.startsWith('/product/')) {
+    sessionStorage.setItem('lastSearch', JSON.stringify(route.query))
+  }
 })
 
 // 已经在 /products 页面时，query 变化也触发搜索
