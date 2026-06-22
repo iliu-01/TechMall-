@@ -6,12 +6,12 @@
         <div class="table-wrap">
         <el-table :data="products" v-loading="loading">
         <el-table-column prop="id" label="ID" width="60" />
-        <el-table-column prop="name" label="名称" min-width="200" />
+        <el-table-column prop="name" label="名称" min-width="220" />
         <el-table-column prop="price" label="价格" width="100"><template #default="{row}">¥{{ row.price }}</template></el-table-column>
         <el-table-column prop="stock" label="库存" width="80" />
         <el-table-column prop="merchantId" label="商家ID" width="80" />
         <el-table-column prop="status" label="状态" width="80"><template #default="{row}"><el-tag :type="row.status === 1 ? 'success' : 'info'">{{ row.status === 1 ? '上架' : '下架' }}</el-tag></template></el-table-column>
-        <el-table-column label="操作" width="120">
+        <el-table-column label="操作" width="100">
           <template #default="{row}">
             <el-button size="small" @click="toggleStatus(row)">{{ row.status === 1 ? '下架' : '上架' }}</el-button>
           </template>

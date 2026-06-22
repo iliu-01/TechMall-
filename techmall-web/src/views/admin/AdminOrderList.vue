@@ -11,8 +11,8 @@
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{row}"><el-tag :type="statusType(row.status)">{{ row.status }}</el-tag></template>
         </el-table-column>
-        <el-table-column prop="receiverName" label="收货人" />
-        <el-table-column label="操作">
+        <el-table-column prop="receiverName" label="收货人" min-width="140" />
+        <el-table-column label="操作" width="80" align="center">
           <template #default="{row}">
             <el-button size="small" @click="$router.push(`/orders/${row.id}`)">详情</el-button>
           </template>

@@ -10,8 +10,8 @@
         <el-table-column prop="status" label="状态" width="120">
           <template #default="{row}"><el-tag :type="statusType(row.status)">{{ row.status }}</el-tag></template>
         </el-table-column>
-        <el-table-column prop="receiverName" label="收货人" />
-        <el-table-column label="操作">
+        <el-table-column prop="receiverName" label="收货人" min-width="140" />
+        <el-table-column label="操作" width="120" align="center">
           <template #default="{row}">
             <el-button size="small" @click="$router.push(`/orders/${row.id}`)">详情</el-button>
             <el-button v-if="row.status === 'PAID'" size="small" type="primary" @click="ship(row.id)">发货</el-button>

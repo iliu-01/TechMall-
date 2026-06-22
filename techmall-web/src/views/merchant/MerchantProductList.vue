@@ -16,7 +16,7 @@
           row-class-name="product-row"
         >
           <el-table-column prop="id" label="ID" width="70" align="center" />
-          <el-table-column prop="name" label="商品名称" min-width="220" show-overflow-tooltip />
+          <el-table-column prop="name" label="商品名称" min-width="240" show-overflow-tooltip />
           <el-table-column label="价格" width="110" align="right">
             <template #default="{row}">
               <span class="price-cell">¥{{ Number(row.price).toLocaleString() }}</span>
@@ -29,7 +29,7 @@
               {{ row.status === 1 ? '上架' : '下架' }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="230" align="center">
+          <el-table-column label="操作" width="210" align="center">
             <template #default="{row}">
               <el-button size="small" text @click="$router.push(`/merchant/product/${row.id}`)">编辑</el-button>
               <el-button size="small" text :type="row.status === 1 ? 'warning' : 'success'" @click="toggleStatus(row)">
