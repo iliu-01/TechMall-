@@ -167,7 +167,10 @@ async function loadData() {
   }
 }
 
-onMounted(loadData)
+onMounted(() => {
+  loadData()
+  sessionStorage.removeItem('lastSearch')
+})
 onUnmounted(() => clearInterval(timer))
 
 // 离开首页时保存滚动位置
