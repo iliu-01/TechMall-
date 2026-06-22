@@ -121,13 +121,14 @@ async function loadNotifications() {
     const url = userStore.role === 'MERCHANT' ? '/order/merchant' : '/order/my'
     const res: any = await request.get(url, { params: { page: 1, size: 20 } })
     const orders = res.data?.records || []
+    const dismissed = JSON.parse(sessionStorage.getItem('notifyDismissed') || '[]')
     const msgs: any[] = []
     for (const o of orders) {
       if (o.status === 'PAID' && userStore.role === 'MERCHANT') {
-        msgs.push({ id: `s${o.id}`, orderId: o.id, icon: '📦', text: `新订单 ${o.orderNo} 待发货`, time: o.createdAt?.slice(0,10) || '' })
+        if (!dismissed.includes(`s${o.id}`)) msgs.push({ id: `s${o.id}`, orderId: o.id, icon: '📦', text: `新订单 ${o.orderNo} 待发货`, time: o.createdAt?.slice(0,10) || '' })
       }
       if (o.status === 'SHIPPED' && userStore.role === 'USER') {
-        msgs.push({ id: `r${o.id}`, orderId: o.id, icon: '🚚', text: `订单 ${o.orderNo} 已发货`, time: o.createdAt?.slice(0,10) || '' })
+        if (!dismissed.includes(`r${o.id}`)) msgs.push({ id: `r${o.id}`, orderId: o.id, icon: '🚚', text: `订单 ${o.orderNo} 已发货`, time: o.createdAt?.slice(0,10) || '' })
       }
     }
     notifications.value = msgs
@@ -137,7 +138,9 @@ async function loadNotifications() {
 
 function dismissNotify(n: any) {
   notifications.value = notifications.value.filter(x => x.id !== n.id)
-  sessionStorage.setItem('notify', JSON.stringify(notifications.value))
+  const dismissed = JSON.parse(sessionStorage.getItem('notifyDismissed') || '[]')
+  dismissed.push(n.id)
+  sessionStorage.setItem('notifyDismissed', JSON.stringify(dismissed))
   showNotify.value = false
   router.push(`/orders/${n.orderId}`)
 }
