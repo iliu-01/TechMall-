@@ -87,7 +87,7 @@ function sType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 
 
 const statusNames: Record<string,string> = { PENDING:'待付款', PAID:'已付款', SHIPPED:'已发货', COMPLETED:'已完成', CANCELLED:'已取消' }
 
-const merchantNames: Record<number,string> = {}
+const merchantNames = ref<Record<number,string>>({})
 
 
 const statCards = computed(() => [
@@ -125,7 +125,7 @@ const pieChartOption = computed(() => ({
 
 const merchantChartOption = computed(() => {
   const map = orderStats.value.byMerchant || {}
-  const labels = Object.keys(map).map(k => merchantNames[Number(k)] || `商家#${k}`)
+  const labels = Object.keys(map).map(k => merchantNames.value[Number(k)] || `商家#${k}`)
   const values: number[] = Object.values(map).map((v:any) => Number(v))
   const isBar = merchantChartType.value === 'bar'
   const base = {
@@ -192,7 +192,7 @@ onMounted(async () => {
   // 获取商家名称
   for (const u of users.value) {
     if (u.role === 'MERCHANT') {
-      merchantNames[u.id] = u.nickname || u.username
+      merchantNames.value[u.id] = u.nickname || u.username
     }
   }
 })
