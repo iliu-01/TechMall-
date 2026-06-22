@@ -25,7 +25,7 @@
           <el-table :data="filteredUsers" style="width:100%;min-width:400px" highlight-current-row @row-click="selectUser" max-height="260">
             <el-table-column prop="nickname" label="名称" min-width="120"><template #default="{row}"><span class="user-name-cell">{{ row.nickname || row.username }}</span></template></el-table-column>
             <el-table-column prop="role" label="角色" width="80" align="center"><template #default="{row}"><el-tag :type="row.role==='MERCHANT'?'warning':'info'" size="small">{{ row.role==='MERCHANT'?'商家':'用户' }}</el-tag></template></el-table-column>
-            <el-table-column label="金额" width="140" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(userSpending[row.id]||0).toLocaleString() }}</span></template></el-table-column>
+            <el-table-column label="金额" width="140" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(userSpending[String(row.id)]||0).toLocaleString() }}</span></template></el-table-column>
           </el-table>
           <!-- 选中用户详情 -->
           <div v-if="selectedUserId" class="user-detail">
@@ -111,7 +111,7 @@ const userFilter = ref('')
 const selectedUserId = ref<number | null>(null)
 const selectedUserName = ref('')
 const selectedUserRole = ref('')
-const userSpending = ref<Record<number,number>>({})
+const userSpending = ref<Record<string,number>>({})
 const selectedUserItems = ref<any[]>([])
 
 const filteredUsers = computed(() => {
@@ -126,17 +126,17 @@ function selectUser(row: any) {
   selectedUserId.value = row.id
   selectedUserName.value = row.nickname || row.username
   selectedUserRole.value = row.role
-  const orders = orderStats.value.userOrders?.[row.id] || []
+  const uid = String(row.id) // JSON key 是字符串
+  const orders = orderStats.value.userOrders?.[uid] || []
   if (row.role === 'MERCHANT') {
-    // 聚合该商家的所有商品
     const map: Record<number,any> = {}
     for (const o of orders) {
       for (const item of (o.items || [])) {
         if (Number(item.merchantId) === Number(row.id)) {
           const key = item.productId
           if (!map[key]) map[key] = { productName: item.productName, price: item.price, quantity: 0, amount: 0 }
-          map[key].quantity += item.quantity
-          map[key].amount += item.amount
+          map[key].quantity += Number(item.quantity || 0)
+          map[key].amount += Number(item.amount || 0)
         }
       }
     }
