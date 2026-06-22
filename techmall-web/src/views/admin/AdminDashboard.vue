@@ -87,18 +87,22 @@ const recentOrders = computed(() => orderStats.value.recentOrders || [])
 
 const statusChartOption = computed(() => ({
   tooltip: { trigger: 'axis' },
-  grid: { left: 60, right: 20, top: 20, bottom: 30 },
+  grid: { left: 60, right: 20, top: 30, bottom: 30 },
   xAxis: { type: 'category', data: Object.keys(orderStats.value.byStatus || {}).map(k => statusNames[k]||k), axisLabel: { color: '#94a3b8', fontSize: 11 } },
   yAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
-  series: [{ type: 'bar', data: Object.values(orderStats.value.byStatus || {}), itemStyle: { color: '#00c6f2', borderRadius: [4,4,0,0] }, barWidth: 32 }],
+  series: [{
+    type: 'bar', data: Object.values(orderStats.value.byStatus || {}),
+    itemStyle: { color: '#00c6f2', borderRadius: [4,4,0,0] }, barWidth: 32,
+    label: { show: true, position: 'top', color: '#94a3b8', fontSize: 11 },
+  }],
 }))
 
 const pieChartOption = computed(() => ({
-  tooltip: { trigger: 'item' },
+  tooltip: { trigger: 'item', formatter: '{b}: {c}单 ({d}%)' },
   legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 11 } },
   series: [{
     type: 'pie', radius: ['45%', '72%'], center: ['50%', '45%'], avoidLabelOverlap: false,
-    label: { show: false },
+    label: { show: true, formatter: '{d}%', color: '#94a3b8', fontSize: 11 },
     itemStyle: { borderRadius: 4, borderColor: '#0b111e', borderWidth: 2 },
     data: Object.entries(orderStats.value.byStatus || {}).map(([k, v]) => ({ name: statusNames[k]||k, value: v })),
   }],
@@ -113,10 +117,13 @@ const merchantChartOption = computed(() => {
   }
   return {
     tooltip: { trigger: 'axis' },
-    grid: { left: 80, right: 20, top: 20, bottom: 30 },
+    grid: { left: 80, right: 40, top: 30, bottom: 30 },
     xAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
     yAxis: { type: 'category', data: Object.keys(map), axisLabel: { color: '#94a3b8', fontSize: 11 } },
-    series: [{ type: 'bar', data: Object.values(map), itemStyle: { color: '#f59e0b', borderRadius: [0,4,4,0] }, barWidth: 24 }],
+    series: [{
+      type: 'bar', data: Object.values(map), itemStyle: { color: '#f59e0b', borderRadius: [0,4,4,0] }, barWidth: 24,
+      label: { show: true, position: 'right', color: '#94a3b8', fontSize: 11 },
+    }],
   }
 })
 
@@ -125,11 +132,12 @@ const rolePieOption = computed(() => {
   for (const u of users.value) { roles[u.role] = (roles[u.role]||0) + 1 }
   const labels: Record<string,string> = { USER:'普通用户', MERCHANT:'商家', ADMIN:'管理员' }
   return {
-    tooltip: { trigger: 'item' },
+    tooltip: { trigger: 'item', formatter: '{b}: {c}人 ({d}%)' },
     legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 11 } },
     series: [{
       type: 'pie', radius: ['45%','72%'], center: ['50%','45%'], avoidLabelOverlap: false,
-      label: { show: false }, itemStyle: { borderRadius: 4, borderColor: '#0b111e', borderWidth: 2 },
+      label: { show: true, formatter: '{d}%', color: '#94a3b8', fontSize: 11 },
+      itemStyle: { borderRadius: 4, borderColor: '#0b111e', borderWidth: 2 },
       data: Object.entries(roles).map(([k, v]) => ({ name: labels[k]||k, value: v })),
     }],
     color: ['#3b82f6', '#f59e0b', '#f43f5e'],
