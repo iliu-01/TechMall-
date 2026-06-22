@@ -172,29 +172,29 @@ const rolePieOption = computed(() => {
 })
 
 onMounted(async () => {
-  const [orderRes, userRes, productRes] = await Promise.all([
-    request.get('/order/stats'),
+  // 先加载用户和产品（填充 merchantNames）
+  const [userRes, productRes, allUsersRes, allProductsRes] = await Promise.all([
     request.get('/user/list', { params: { page:1, size:1 } }),
     request.get('/product/list', { params: { page:1, size:1, includeOffShelf: true } }),
-  ])
-  orderStats.value = orderRes.data || {}
-  userCount.value = userRes.data?.total || 0
-  productCount.value = productRes.data?.total || 0
-
-  // 获取全量数据用于图表
-  const [allUsers, allProducts] = await Promise.all([
     request.get('/user/list', { params: { page:1, size:100 } }),
     request.get('/product/list', { params: { page:1, size:100, includeOffShelf: true } }),
   ])
-  users.value = allUsers.data?.records || []
-  products.value = allProducts.data?.records || []
+  userCount.value = userRes.data?.total || 0
+  productCount.value = productRes.data?.total || 0
+  users.value = allUsersRes.data?.records || []
+  products.value = allProductsRes.data?.records || []
 
-  // 获取商家名称
   for (const u of users.value) {
     if (u.role === 'MERCHANT') {
       merchantNames.value[u.id] = u.nickname || u.username
     }
   }
+
+  // 最后加载订单统计（此时 merchantNames 已就绪，图表首次渲染直接显示昵称）
+  try {
+    const orderRes: any = await request.get('/order/stats')
+    orderStats.value = orderRes.data || {}
+  } catch {}
 })
 </script>
 
