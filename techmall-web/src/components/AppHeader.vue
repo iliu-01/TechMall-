@@ -43,7 +43,7 @@
               </span>
             </template>
             <div v-if="notifications.length" class="notify-list">
-              <div v-for="n in notifications" :key="n.id" class="notify-item" @click="$router.push(`/orders/${n.orderId}`)">
+              <div v-for="n in notifications" :key="n.id" class="notify-item" @click="dismissNotify(n)">
                 <span class="notify-icon">{{ n.icon }}</span>
                 <div class="notify-text">
                   <div>{{ n.text }}</div>
@@ -132,6 +132,12 @@ async function loadNotifications() {
     notifications.value = msgs
     sessionStorage.setItem('notify', JSON.stringify(msgs))
   } catch { /* 忽略 */ }
+}
+
+function dismissNotify(n: any) {
+  notifications.value = notifications.value.filter(x => x.id !== n.id)
+  sessionStorage.setItem('notify', JSON.stringify(notifications.value))
+  router.push(`/orders/${n.orderId}`)
 }
 
 onMounted(() => { loadNotifications() })
