@@ -36,8 +36,27 @@
             <span class="nav-balance">¥{{ Number(userStore.userInfo?.balance || 0).toLocaleString() }}</span>
           </span>
           <span v-if="userStore.role === 'ADMIN'" class="nav-role role-admin">管理员</span>
+          <el-popover v-if="userStore.role !== 'ADMIN'" placement="bottom" :width="280" trigger="click">
+            <template #reference>
+              <span class="bell-btn">
+                🔔<span v-if="notifyCount" class="bell-badge">{{ notifyCount }}</span>
+              </span>
+            </template>
+            <div v-if="notifications.length" class="notify-list">
+              <div v-for="n in notifications" :key="n.id" class="notify-item" @click="$router.push(`/orders/${n.orderId}`)">
+                <span class="notify-icon">{{ n.icon }}</span>
+                <div class="notify-text">
+                  <div>{{ n.text }}</div>
+                  <div class="notify-time">{{ n.time }}</div>
+                </div>
+              </div>
+            </div>
+            <div v-else style="text-align:center;color:var(--text-muted);padding:12px">暂无新消息</div>
+          </el-popover>
           <el-dropdown>
-            <span class="user-avatar">👤</span>
+            <span class="user-avatar-wrap">
+              <span class="user-avatar">👤</span>
+            </span>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item v-if="userStore.role === 'USER'" @click="$router.push('/orders')">📋 我的订单</el-dropdown-item>
@@ -63,8 +82,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 
@@ -89,6 +109,32 @@ function goHome() {
   sessionStorage.removeItem('homeScrollY')
   router.push('/home')
 }
+
+// 消息通知
+const notifications = ref<any[]>(JSON.parse(sessionStorage.getItem('notify') || '[]'))
+const notifyCount = computed(() => notifications.value.length)
+
+async function loadNotifications() {
+  if (userStore.role === 'ADMIN' || !userStore.isLoggedIn) return
+  try {
+    const url = userStore.role === 'MERCHANT' ? '/order/merchant' : '/order/my'
+    const res: any = await request.get(url, { params: { page: 1, size: 20 } })
+    const orders = res.data?.records || []
+    const msgs: any[] = []
+    for (const o of orders) {
+      if (o.status === 'PAID' && userStore.role === 'MERCHANT') {
+        msgs.push({ id: `s${o.id}`, orderId: o.id, icon: '📦', text: `新订单 ${o.orderNo} 待发货`, time: o.createdAt?.slice(0,10) || '' })
+      }
+      if (o.status === 'SHIPPED' && userStore.role === 'USER') {
+        msgs.push({ id: `r${o.id}`, orderId: o.id, icon: '🚚', text: `订单 ${o.orderNo} 已发货`, time: o.createdAt?.slice(0,10) || '' })
+      }
+    }
+    notifications.value = msgs
+    sessionStorage.setItem('notify', JSON.stringify(msgs))
+  } catch { /* 忽略 */ }
+}
+
+onMounted(() => { loadNotifications() })
 
 function search() {
   const term = keyword.value.trim()
@@ -160,8 +206,36 @@ function search() {
   font-size: 0.72rem; color: var(--accent-amber);
   font-family: var(--font-display); font-weight: 600;
 }
-.user-avatar { cursor: pointer; font-size: 1.2rem; padding: 4px; }
+.user-avatar-wrap {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--duration-fast);
+}
+.user-avatar-wrap:hover { border-color: var(--accent-cyan); }
+.user-avatar { cursor: pointer; font-size: 1rem; }
 .login-btn { font-size: 0.85rem; color: var(--accent-cyan); font-weight: 500; text-decoration: none; }
+
+.bell-btn {
+  position: relative; cursor: pointer; font-size: 1.1rem; color: var(--text-secondary);
+  padding: 4px; transition: color var(--duration-fast);
+}
+.bell-btn:hover { color: var(--accent-cyan); }
+.bell-badge {
+  position: absolute; top: -2px; right: -4px;
+  width: 16px; height: 16px; background: var(--accent-rose);
+  border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+  color: #fff; display: flex; align-items: center; justify-content: center;
+}
+.notify-list { max-height: 240px; overflow-y: auto; }
+.notify-item {
+  display: flex; gap: 8px; padding: 8px; cursor: pointer;
+  border-radius: 6px; transition: background var(--duration-fast);
+}
+.notify-item:hover { background: rgba(0,198,242,0.05); }
+.notify-icon { font-size: 1.1rem; flex-shrink: 0; }
+.notify-text { font-size: 0.8rem; line-height: 1.4; }
+.notify-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
 .cart-btn {
   background: none; border: none; font-size: 1.2rem; cursor: pointer;
   color: var(--text-secondary); padding: 4px; position: relative;
