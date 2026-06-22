@@ -81,5 +81,5 @@ a:hover { opacity: 0.85; }
 .el-message { top: 72px !important; }
 
 /* 页面容器 */
-.page-container { max-width: 1320px; margin: 0 auto; padding: 0 var(--space-lg) var(--space-3xl); }
+.page-container { max-width: 1320px; margin: 0 auto; padding: 0 var(--space-lg) var(--space-3xl); min-height: 60vh; }
 .section-title { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; margin-bottom: var(--space-lg); }
