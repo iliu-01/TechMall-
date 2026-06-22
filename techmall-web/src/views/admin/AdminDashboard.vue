@@ -42,10 +42,11 @@
       <div class="table-wrap" style="margin-top:var(--space-lg)">
         <h4 style="padding:var(--space-md) var(--space-lg) 0;font-family:var(--font-display)">📋 最近订单</h4>
         <el-table :data="recentOrders" style="width:100%">
-          <el-table-column prop="orderNo" label="订单号" width="200" />
-          <el-table-column prop="totalAmount" label="金额" width="120"><template #default="{row}">¥{{ Number(row.totalAmount).toLocaleString() }}</template></el-table-column>
+          <el-table-column prop="orderNo" label="订单号" min-width="200" />
+          <el-table-column label="金额" width="130"><template #default="{row}"><span class="price-cell">¥{{ Number(row.totalAmount).toLocaleString() }}</span></template></el-table-column>
           <el-table-column prop="status" label="状态" width="100" align="center"><template #default="{row}"><el-tag :type="sType(row.status)" size="small">{{ row.status }}</el-tag></template></el-table-column>
-          <el-table-column prop="createdAt" label="时间" width="180"><template #default="{row}">{{ row.createdAt?.slice(0,16)?.replace('T',' ') }}</template></el-table-column>
+          <el-table-column prop="receiverName" label="收货人" width="100" />
+          <el-table-column label="时间" min-width="160"><template #default="{row}">{{ row.createdAt?.slice(0,16)?.replace('T',' ') }}</template></el-table-column>
         </el-table>
       </div>
     </div>
