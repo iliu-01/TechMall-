@@ -57,14 +57,12 @@
       <div class="chart-row">
         <div class="chart-box">
           <div class="chart-header">
-            <h4>🏪 各商家销售额</h4>
-            <span class="chart-toggle" @click="merchantChartType = merchantChartType==='bar'?'pie':'bar'">{{ merchantChartType==='bar' ? '📊饼图' : '📊柱图' }}</span>
+            <h4 v-if="selectedUserId">📈 {{ selectedUserName }} 的{{ selectedUserRole==='MERCHANT' ? '商品销售' : '消费' }}明细</h4>
+            <h4 v-else>🏪 各商家销售额</h4>
+            <span class="chart-toggle" @click="detailChartType = detailChartType==='bar'?'pie':'bar'">{{ detailChartType==='bar' ? '📊饼图' : '📊柱图' }}</span>
           </div>
-          <v-chart :option="merchantChartOption" style="height:300px" autoresize />
-          <div v-if="selectedMerchant" class="merchant-detail">
-            <span>已选: 商家#{{ selectedMerchant }} | 销售额 ¥{{ Number(selectedMerchantSales).toLocaleString() }}</span>
-            <a @click="selectedMerchant=null" style="color:var(--accent-cyan);cursor:pointer;margin-left:8px">清除</a>
-          </div>
+          <v-chart v-if="selectedUserId" :option="userDetailChartOption" style="height:300px" autoresize />
+          <v-chart v-else :option="merchantChartOption" style="height:300px" autoresize />
         </div>
         <div class="chart-box">
           <h4>🧑‍💼 用户角色分布</h4>
@@ -106,9 +104,7 @@ const userCount = ref(0)
 const productCount = ref(0)
 const users = ref<any[]>([])
 const products = ref<any[]>([])
-const merchantChartType = ref('bar')
-const selectedMerchant = ref<number | null>(null)
-const selectedMerchantSales = ref(0)
+const detailChartType = ref('bar')
 
 // 用户表逻辑
 const userFilter = ref('')
@@ -182,7 +178,7 @@ const merchantChartOption = computed(() => {
   const map = orderStats.value.byMerchant || {}
   const labels = Object.keys(map).map(k => merchantNames[Number(k)] || `商家#${k}`)
   const values: number[] = Object.values(map).map((v:any) => Number(v))
-  const isBar = merchantChartType.value === 'bar'
+  const isBar = detailChartType.value === 'bar'
   const base = {
     tooltip: { trigger: isBar ? 'axis' : 'item', formatter: isBar ? undefined : '{b}: ¥{c} ({d}%)' },
     grid: isBar ? { left: 100, right: 40, top: 30, bottom: 30 } : undefined,
@@ -198,15 +194,31 @@ const merchantChartOption = computed(() => {
     avoidLabelOverlap: false,
   }]
   if (isBar) {
-    return {
-      ...base,
-      xAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
-      yAxis: { type: 'category', data: labels, axisLabel: { color: '#94a3b8', fontSize: 11 } },
-      series,
-      color: ['#f59e0b','#00c6f2','#22c55e'],
-    }
+    return { ...base, xAxis: { type: 'value', axisLabel: { color: '#94a3b8' } }, yAxis: { type: 'category', data: labels, axisLabel: { color: '#94a3b8', fontSize: 11 } }, series, color: ['#f59e0b','#00c6f2','#22c55e'] }
   }
   return { ...base, series, legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 11 } }, color: ['#f59e0b','#00c6f2','#22c55e'] }
+})
+
+const userDetailChartOption = computed(() => {
+  const items = selectedUserItems.value
+  const labels = items.map((i:any) => i.productName || i.orderNo || '—')
+  const values = items.map((i:any) => Number(i.amount || 0))
+  const isBar = detailChartType.value === 'bar'
+  if (isBar) {
+    return {
+      tooltip: { trigger: 'axis' },
+      grid: { left: 120, right: 40, top: 20, bottom: 30 },
+      xAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
+      yAxis: { type: 'category', data: labels, axisLabel: { color: '#94a3b8', fontSize: 11 } },
+      series: [{ type: 'bar', data: values, itemStyle: { color: '#00c6f2', borderRadius: [0,4,4,0] }, barWidth: 20, label: { show: true, position: 'right', color: '#94a3b8', fontSize: 10 } }],
+    }
+  }
+  return {
+    tooltip: { trigger: 'item', formatter: '{b}: ¥{c} ({d}%)' },
+    legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 10 } },
+    series: [{ type: 'pie', radius: ['45%','72%'], center: ['50%','50%'], avoidLabelOverlap: false, label: { show: true, formatter: '{d}%', color: '#94a3b8', fontSize: 10 }, itemStyle: { borderRadius: 4, borderColor: '#0b111e', borderWidth: 2 }, data: labels.map((n,i) => ({ name: n, value: values[i] })) }],
+    color: ['#f59e0b','#00c6f2','#3b82f6','#22c55e','#a855f7','#f43f5e'],
+  }
 })
 
 const rolePieOption = computed(() => {
