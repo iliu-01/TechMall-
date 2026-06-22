@@ -15,6 +15,16 @@
         <span class="search-icon" @click="search">🔍</span>
       </div>
 
+      <div class="nav-links">
+        <router-link to="/home" class="nav-link">首页</router-link>
+        <router-link v-if="userStore.role === 'USER'" to="/orders" class="nav-link">我的订单</router-link>
+        <router-link v-if="userStore.role === 'USER'" to="/account" class="nav-link">充值</router-link>
+        <router-link v-if="userStore.role === 'MERCHANT'" to="/merchant/products" class="nav-link">商品管理</router-link>
+        <router-link v-if="userStore.role === 'MERCHANT'" to="/merchant/orders" class="nav-link">订单管理</router-link>
+        <router-link v-if="userStore.role === 'ADMIN'" to="/admin/users" class="nav-link">用户管理</router-link>
+        <router-link v-if="userStore.role === 'ADMIN'" to="/admin/orders" class="nav-link">订单管理</router-link>
+      </div>
+
       <div class="nav-actions">
         <template v-if="userStore.isLoggedIn">
           <!-- 用户/商家：角色标签 + 昵称 + 余额 -->
@@ -110,7 +120,16 @@ function search() {
   display: flex; align-items: center; justify-content: center;
   font-size: 0.9rem;
 }
-.nav-search { flex: 1; max-width: 420px; position: relative; }
+.nav-links { display: flex; gap: 2px; flex-shrink: 0; }
+.nav-link {
+  padding: 6px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 500;
+  color: var(--text-secondary); text-decoration: none;
+  transition: all var(--duration-fast); white-space: nowrap;
+}
+.nav-link:hover { color: var(--accent-cyan); background: rgba(0,198,242,0.06); }
+.nav-link.router-link-active { color: var(--accent-cyan); }
+
+.nav-search { flex: 1; max-width: 380px; position: relative; }
 .nav-search input {
   width: 100%; background: var(--bg-surface);
   border: 1px solid var(--border-subtle); border-radius: 24px;
