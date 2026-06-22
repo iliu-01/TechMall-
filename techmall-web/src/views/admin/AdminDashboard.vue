@@ -249,21 +249,12 @@ const rolePieOption = computed(() => {
 })
 
 onMounted(async () => {
-  const [orderRes, userRes, productRes] = await Promise.all([
-    request.get('/order/stats'),
-    request.get('/user/list', { params: { page:1, size:1 } }),
-    request.get('/product/list', { params: { page:1, size:1, includeOffShelf: true } }),
-  ])
-  orderStats.value = orderRes.data || {}
-  userCount.value = userRes.data?.total || 0
-  productCount.value = productRes.data?.total || 0
-
-  const [allUsers, allProducts] = await Promise.all([
-    request.get('/user/list', { params: { page:1, size:100 } }),
-    request.get('/product/list', { params: { page:1, size:100, includeOffShelf: true } }),
-  ])
-  users.value = allUsers.data?.records || []
-  products.value = allProducts.data?.records || []
+  // 独立请求，避免一个失败影响全部
+  try { const r: any = await request.get('/order/stats'); orderStats.value = r.data || {} } catch {}
+  try { const r: any = await request.get('/user/list', { params: { page:1, size:1 } }); userCount.value = r.data?.total || 0 } catch {}
+  try { const r: any = await request.get('/product/list', { params: { page:1, size:1, includeOffShelf:true } }); productCount.value = r.data?.total || 0 } catch {}
+  try { const r: any = await request.get('/user/list', { params: { page:1, size:100 } }); users.value = r.data?.records || [] } catch {}
+  try { const r: any = await request.get('/product/list', { params: { page:1, size:100, includeOffShelf:true } }); products.value = r.data?.records || [] } catch {}
 
   for (const u of users.value) {
     if (u.role === 'MERCHANT') {
