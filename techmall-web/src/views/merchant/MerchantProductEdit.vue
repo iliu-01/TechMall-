@@ -14,6 +14,7 @@
     </div>
   </div>
   <AppFooter />
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

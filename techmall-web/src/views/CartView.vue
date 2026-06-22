@@ -32,10 +32,12 @@
           </div>
         </el-card>
         <AppFooter />
+  <AppFooter />
 </template>
     </div>
     <CartDrawer :visible="showCart" @close="showCart = false" />
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

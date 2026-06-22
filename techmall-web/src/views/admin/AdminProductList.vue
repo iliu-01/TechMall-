@@ -8,6 +8,7 @@
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="name" label="名称" min-width="200" />
         <el-table-column prop="price" label="价格" width="100"><template #default="{row}">¥{{ row.price }}  <AppFooter />
+  <AppFooter />
 </template></el-table-column>
         <el-table-column prop="stock" label="库存" width="80" />
         <el-table-column prop="merchantId" label="商家ID" width="80" />
@@ -21,6 +22,7 @@
       </div>
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

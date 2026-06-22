@@ -28,6 +28,7 @@
           </div>
         </div>
         <AppFooter />
+  <AppFooter />
 </template>
 
       <!-- 修改信息 -->
@@ -46,6 +47,7 @@
     </div>
     <CartDrawer :visible="showCart" @close="showCart = false" />
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

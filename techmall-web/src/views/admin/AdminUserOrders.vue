@@ -8,6 +8,7 @@
         <el-table :data="orders" v-loading="loading">
           <el-table-column prop="orderNo" label="订单号" width="220" />
           <el-table-column label="金额" width="120"><template #default="{row}"><span class="price-cell">¥{{ Number(row.totalAmount).toLocaleString() }}</span>  <AppFooter />
+  <AppFooter />
 </template></el-table-column>
           <el-table-column prop="status" label="状态" width="110" align="center">
             <template #default="{row}"><el-tag :type="statusType(row.status)" size="small">{{ row.status }}</el-tag></template>
@@ -24,6 +25,7 @@
       <el-empty v-if="!loading && orders.length === 0" description="暂无订单" />
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

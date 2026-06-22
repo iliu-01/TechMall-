@@ -21,6 +21,7 @@
             <template #default="{row}">
               <span class="price-cell">¥{{ Number(row.price).toLocaleString() }}</span>
               <AppFooter />
+  <AppFooter />
 </template>
           </el-table-column>
           <el-table-column prop="stock" label="库存" width="70" align="center" />
@@ -47,6 +48,7 @@
       </div>
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

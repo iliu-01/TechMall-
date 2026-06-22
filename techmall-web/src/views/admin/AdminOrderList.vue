@@ -8,6 +8,7 @@
         <el-table-column prop="orderNo" label="订单号" width="200" />
         <el-table-column prop="userId" label="用户ID" width="80" />
         <el-table-column prop="totalAmount" label="金额" width="120"><template #default="{row}">¥{{ row.totalAmount }}  <AppFooter />
+  <AppFooter />
 </template></el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{row}"><el-tag :type="statusType(row.status)">{{ row.status }}</el-tag></template>
@@ -22,6 +23,7 @@
       </div>
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

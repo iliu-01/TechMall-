@@ -9,6 +9,7 @@
         <el-table-column prop="username" label="用户名" width="120" />
         <el-table-column prop="nickname" label="昵称" width="120" />
         <el-table-column prop="role" label="角色" width="100"><template #default="{row}"><el-tag>{{ row.role }}</el-tag>  <AppFooter />
+  <AppFooter />
 </template></el-table-column>
         <el-table-column prop="status" label="状态" width="80"><template #default="{row}"><el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '正常' : '禁用' }}</el-tag></template></el-table-column>
         <el-table-column label="管理" width="200" align="center">
@@ -32,6 +33,7 @@
       </div>
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

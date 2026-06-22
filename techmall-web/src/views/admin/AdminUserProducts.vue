@@ -9,6 +9,7 @@
           <el-table-column prop="id" label="ID" width="70" align="center" />
           <el-table-column prop="name" label="商品名称" min-width="220" show-overflow-tooltip />
           <el-table-column label="价格" width="110" align="right"><template #default="{row}"><span class="price-cell">¥{{ Number(row.price).toLocaleString() }}</span>  <AppFooter />
+  <AppFooter />
 </template></el-table-column>
           <el-table-column prop="stock" label="库存" width="70" align="center" />
           <el-table-column label="状态" width="90" align="center">
@@ -28,6 +29,7 @@
       <el-empty v-if="!loading && products.length === 0" description="暂无商品" />
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">

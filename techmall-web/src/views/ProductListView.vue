@@ -38,6 +38,7 @@
     <CartDrawer :visible="showCart" @close="showCart = false" />
   </div>
   <AppFooter />
+  <AppFooter />
 </template>
 
 <script setup lang="ts">
