@@ -19,15 +19,14 @@
     </div>
   </div>
   <AppFooter />
-  <AppFooter />
 </template>
 
 <script setup lang="ts">
+import AppFooter from '@/components/AppFooter.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
-import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 

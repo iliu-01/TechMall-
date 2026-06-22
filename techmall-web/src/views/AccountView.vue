@@ -27,9 +27,7 @@
             <el-button type="primary" :loading="recharging" @click="doRecharge" style="border-radius:20px">确认充值</el-button>
           </div>
         </div>
-        <AppFooter />
-  <AppFooter />
-</template>
+      </template>
 
       <!-- 修改信息 -->
       <h3 style="margin-top:var(--space-xl);margin-bottom:var(--space-md);font-family:var(--font-display)">✏️ 修改信息</h3>
@@ -51,11 +49,11 @@
 </template>
 
 <script setup lang="ts">
+import AppFooter from '@/components/AppFooter.vue'
 import { ref, reactive, computed, onMounted } from 'vue'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 

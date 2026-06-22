@@ -41,9 +41,11 @@
       </div>
     </div>
   </div>
+  <AppFooter />
 </template>
 
 <script setup lang="ts">
+import AppFooter from '@/components/AppFooter.vue'
 import { ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'

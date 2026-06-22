@@ -20,9 +20,7 @@
           <el-table-column label="价格" width="110" align="right">
             <template #default="{row}">
               <span class="price-cell">¥{{ Number(row.price).toLocaleString() }}</span>
-              <AppFooter />
-  <AppFooter />
-</template>
+            </template>
           </el-table-column>
           <el-table-column prop="stock" label="库存" width="70" align="center" />
           <el-table-column label="状态" width="90" align="center">
@@ -52,11 +50,11 @@
 </template>
 
 <script setup lang="ts">
+import AppFooter from '@/components/AppFooter.vue'
 import { ref, onMounted } from 'vue'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 const userStore = useUserStore()
