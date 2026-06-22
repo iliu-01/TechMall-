@@ -59,11 +59,8 @@
 
       <div class="chart-row">
         <div class="chart-box">
-          <div class="chart-header">
-            <h4>🏪 各商家销售额</h4>
-            <span class="chart-toggle" @click="merchantChartType = merchantChartType==='bar'?'pie':'bar'">{{ merchantChartType==='bar' ? '📊饼图' : '📊柱图' }}</span>
-          </div>
-          <v-chart :option="merchantChartOption" style="height:300px" autoresize />
+          <h4>🔥 热销商品排行</h4>
+          <v-chart :option="topProductsOption" style="height:300px" autoresize />
         </div>
         <div class="chart-box">
           <h4>🧑‍💼 用户角色分布</h4>
@@ -105,7 +102,6 @@ const userCount = ref(0)
 const productCount = ref(0)
 const users = ref<any[]>([])
 const products = ref<any[]>([])
-const merchantChartType = ref('bar')
 
 // 用户列表
 const userFilter = ref('')
@@ -115,8 +111,6 @@ const pickedItems = ref<any[]>([])
 function sType(s: string) { return s === 'PENDING' ? 'warning' : s === 'PAID' ? 'primary' : s === 'SHIPPED' ? 'info' : s === 'COMPLETED' ? 'success' : 'danger' }
 
 const statusNames: Record<string,string> = { PENDING:'待付款', PAID:'已付款', SHIPPED:'已发货', COMPLETED:'已完成', CANCELLED:'已取消' }
-
-const merchantNames = ref<Record<number,string>>({})
 
 const filteredUsers = computed(() => {
   const t = userFilter.value.toLowerCase()
@@ -176,35 +170,28 @@ const pieChartOption = computed(() => ({
   color: ['#f59e0b', '#00c6f2', '#3b82f6', '#22c55e', '#64748b'],
 }))
 
-const merchantChartOption = computed(() => {
-  const map = orderStats.value.byMerchant || {}
-  const labels = Object.keys(map).map(k => merchantNames.value[Number(k)] || `商家#${k}`)
-  const values: number[] = Object.values(map).map((v:any) => Number(v))
-  const isBar = merchantChartType.value === 'bar'
-  const base = {
-    tooltip: { trigger: isBar ? 'axis' : 'item', formatter: isBar ? undefined : '{b}: ¥{c} ({d}%)' },
-    grid: isBar ? { left: 100, right: 40, top: 30, bottom: 30 } : undefined,
-  }
-  const series = [{
-    type: isBar ? 'bar' : 'pie',
-    data: isBar ? values : labels.map((n,i) => ({ name: n, value: values[i] })),
-    itemStyle: isBar ? { color: '#f59e0b', borderRadius: [0,4,4,0] } : { borderRadius: 4, borderColor: '#0b111e', borderWidth: 2 },
-    barWidth: isBar ? 24 : undefined,
-    radius: isBar ? undefined : ['45%','72%'],
-    center: isBar ? undefined : ['50%','50%'],
-    label: { show: true, position: isBar?'right':undefined, formatter: isBar?undefined:'{d}%', color: '#94a3b8', fontSize: 11 },
-    avoidLabelOverlap: false,
-  }]
-  if (isBar) {
-    return {
-      ...base,
-      xAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
-      yAxis: { type: 'category', data: labels, axisLabel: { color: '#94a3b8', fontSize: 11 } },
-      series,
-      color: ['#f59e0b','#00c6f2','#22c55e'],
+const topProductsOption = computed(() => {
+  // 从所有订单聚合各商品总销量
+  const all = orderStats.value.userOrders || {}
+  const agg: Record<string,{name:string,qty:number;amount:number}> = {}
+  for (const key of Object.keys(all)) {
+    for (const o of (all[key] || [])) {
+      for (const item of (o.items || [])) {
+        const name = item.productName || ''
+        if (!agg[name]) agg[name] = { name, qty: 0, amount: 0 }
+        agg[name].qty += Number(item.quantity || 0)
+        agg[name].amount += Number(item.amount || 0)
+      }
     }
   }
-  return { ...base, series, legend: { bottom: 0, textStyle: { color: '#94a3b8', fontSize: 11 } }, color: ['#f59e0b','#00c6f2','#22c55e'] }
+  const sorted = Object.values(agg).sort((a,b) => b.amount - a.amount).slice(0, 8)
+  return {
+    tooltip: { trigger: 'axis', formatter: (p:any) => `${p[0].name}<br/>销量: ${agg[p[0].name]?.qty} | 销售额: ¥${p[0].value.toLocaleString()}` },
+    grid: { left: 120, right: 40, top: 10, bottom: 20 },
+    xAxis: { type: 'value', axisLabel: { color: '#94a3b8', fontSize: 10 } },
+    yAxis: { type: 'category', data: sorted.map(s => s.name.length > 12 ? s.name.slice(0,12)+'…' : s.name).reverse(), axisLabel: { color: '#94a3b8', fontSize: 10 }, inverse: true },
+    series: [{ type: 'bar', data: sorted.map(s => s.amount).reverse(), itemStyle: { color: '#00c6f2', borderRadius: [0,4,4,0] }, barWidth: 18, label: { show: true, position: 'right', color: '#94a3b8', fontSize: 10, formatter: (p:any) => '¥'+Number(p.value).toLocaleString() } }],
+  }
 })
 
 const rolePieOption = computed(() => {
@@ -237,13 +224,7 @@ onMounted(async () => {
   users.value = allUsersRes.data?.records || []
   products.value = allProductsRes.data?.records || []
 
-  for (const u of users.value) {
-    if (u.role === 'MERCHANT') {
-      merchantNames.value[u.id] = u.nickname || u.username
-    }
-  }
-
-  // 最后加载订单统计（此时 merchantNames 已就绪，图表首次渲染直接显示昵称）
+  // 加载订单统计
   try {
     const orderRes: any = await request.get('/order/stats')
     orderStats.value = orderRes.data || {}
