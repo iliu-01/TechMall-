@@ -43,7 +43,7 @@
               </span>
             </template>
             <div v-if="notifications.length" class="notify-list">
-              <div v-for="n in notifications" :key="n.id" class="notify-item" @click="dismissNotify(n)">
+              <div v-for="n in notifications" :key="n.id" class="notify-item" @click.stop="dismissNotify(n)">
                 <span class="notify-icon">{{ n.icon }}</span>
                 <div class="notify-text">
                   <div>{{ n.text }}</div>
