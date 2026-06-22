@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppHeader @toggleCart="showCart = true" />
-    <div class="page-container" style="margin-top: var(--space-xl)" v-if="detail">
+    <div class="page-container" style="margin-top: var(--space-xl); min-height: calc(100vh - 320px)" v-if="detail">
       <h2 class="section-title">📋 订单详情 — {{ detail.order.orderNo }}</h2>
 
       <el-card style="margin-bottom:var(--space-lg);background:var(--bg-surface);border-color:var(--border-subtle)">

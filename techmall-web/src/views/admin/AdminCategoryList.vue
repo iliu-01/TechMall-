@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppHeader />
-    <div class="page-container" style="margin-top: var(--space-xl)">
+    <div class="page-container" style="margin-top: var(--space-xl); min-height: calc(100vh - 320px)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
         <h2 class="section-title" style="margin-bottom:0">📂 分类管理</h2>
       </div>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppHeader />
-    <div class="page-container" style="margin-top: var(--space-xl)">
+    <div class="page-container" style="margin-top: var(--space-xl); min-height: calc(100vh - 320px)">
       <router-link to="/admin/users" class="back-link">← 返回用户管理</router-link>
       <h2 class="section-title">📦 {{ targetName }} 的商品</h2>
       <div class="table-wrap">

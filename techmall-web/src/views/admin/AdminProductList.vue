@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppHeader />
-    <div class="page-container" style="margin-top: var(--space-xl)">
+    <div class="page-container" style="margin-top: var(--space-xl); min-height: calc(100vh - 320px)">
       <h2 class="section-title">📦 全站商品管理</h2>
         <div class="table-wrap">
         <el-table :data="products" v-loading="loading">
