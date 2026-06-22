@@ -19,6 +19,7 @@ const router = createRouter({
     { path: '/merchant/product/add', name: 'MerchantProductAdd', component: () => import('@/views/merchant/MerchantProductAdd.vue'), meta: { roles: ['MERCHANT'] } },
     { path: '/merchant/product/:id', name: 'MerchantProductEdit', component: () => import('@/views/merchant/MerchantProductEdit.vue'), meta: { roles: ['MERCHANT'] } },
     { path: '/merchant/orders', name: 'MerchantOrders', component: () => import('@/views/merchant/MerchantOrderList.vue'), meta: { roles: ['MERCHANT'] } },
+    { path: '/admin/dashboard', name: 'AdminDashboard', component: () => import('@/views/admin/AdminDashboard.vue'), meta: { roles: ['ADMIN'] } },
     { path: '/admin/users', name: 'AdminUsers', component: () => import('@/views/admin/AdminUserList.vue'), meta: { roles: ['ADMIN'] } },
     { path: '/admin/products', name: 'AdminProducts', component: () => import('@/views/admin/AdminProductList.vue'), meta: { roles: ['ADMIN'] } },
     { path: '/admin/categories', name: 'AdminCategories', component: () => import('@/views/admin/AdminCategoryList.vue'), meta: { roles: ['ADMIN'] } },

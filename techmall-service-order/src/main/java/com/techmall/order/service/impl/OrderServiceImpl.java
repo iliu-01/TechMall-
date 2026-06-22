@@ -224,4 +224,37 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.updateStatus(orderId, "PAID");
         return Result.success();
     }
+
+    @Override
+    public Result<?> getStats() {
+        // 查询所有订单聚合统计
+        List<Order> all = orderMapper.selectAll(null, null);
+        Map<String, Object> stats = new HashMap<>();
+
+        // 总数 + 总额
+        long totalOrders = all.size();
+        BigDecimal totalSales = all.stream()
+                .filter(o -> !"CANCELLED".equals(o.getStatus()))
+                .map(Order::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 按状态分组
+        Map<String, Long> byStatus = new LinkedHashMap<>();
+        for (String s : VALID_STATUSES) {
+            long count = all.stream().filter(o -> s.equals(o.getStatus())).count();
+            byStatus.put(s, count);
+        }
+
+        // 最近订单
+        List<Order> recent = all.stream()
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .limit(5)
+                .collect(java.util.stream.Collectors.toList());
+
+        stats.put("totalOrders", totalOrders);
+        stats.put("totalSales", totalSales);
+        stats.put("byStatus", byStatus);
+        stats.put("recentOrders", recent);
+        return Result.success(stats);
+    }
 }

@@ -67,4 +67,9 @@ public class OrderController {
                               @RequestHeader("X-User-Id") Long userId) {
         return orderService.payOrder(id, userId);
     }
+
+    @GetMapping("/stats")
+    public Result<?> stats() {
+        return orderService.getStats();
+    }
 }

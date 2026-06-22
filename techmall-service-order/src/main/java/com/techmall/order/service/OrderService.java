@@ -19,4 +19,6 @@ public interface OrderService {
     Result<?> cancelOrder(Long orderId, Long userId);
 
     Result<?> payOrder(Long orderId, Long userId);
+
+    Result<?> getStats();
 }

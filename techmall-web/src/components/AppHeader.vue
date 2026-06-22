@@ -21,6 +21,7 @@
         <router-link v-if="userStore.role === 'USER'" to="/account" class="nav-link">充值</router-link>
         <router-link v-if="userStore.role === 'MERCHANT'" to="/merchant/products" class="nav-link">商品管理</router-link>
         <router-link v-if="userStore.role === 'MERCHANT'" to="/merchant/orders" class="nav-link">订单管理</router-link>
+        <router-link v-if="userStore.role === 'ADMIN'" to="/admin/dashboard" class="nav-link">数据概览</router-link>
         <router-link v-if="userStore.role === 'ADMIN'" to="/admin/users" class="nav-link">用户管理</router-link>
         <router-link v-if="userStore.role === 'ADMIN'" to="/admin/orders" class="nav-link">订单管理</router-link>
       </div>
@@ -62,6 +63,7 @@
                 <el-dropdown-item v-if="userStore.role === 'USER'" @click="$router.push('/orders')">📋 我的订单</el-dropdown-item>
                 <el-dropdown-item v-if="userStore.role === 'MERCHANT'" @click="$router.push('/merchant/products')">📦 商品管理</el-dropdown-item>
                 <el-dropdown-item v-if="userStore.role === 'MERCHANT'" @click="$router.push('/merchant/orders')">📊 订单管理</el-dropdown-item>
+                <el-dropdown-item v-if="userStore.role === 'ADMIN'" @click="$router.push('/admin/dashboard')">📊 数据概览</el-dropdown-item>
                 <el-dropdown-item v-if="userStore.role === 'ADMIN'" @click="$router.push('/admin/users')">⚙️ 管理后台</el-dropdown-item>
                 <el-dropdown-item v-if="userStore.role !== 'ADMIN'" @click="$router.push('/account')">👤 账户设置</el-dropdown-item>
                 <el-dropdown-item divided @click="userStore.logout()">🚪 退出登录</el-dropdown-item>
