@@ -22,11 +22,13 @@
             <h4>🧑‍💼 用户消费 / 商家销售</h4>
             <el-input v-model="userFilter" placeholder="搜索名称…" size="small" style="width:180px" clearable />
           </div>
+          <div class="table-wrap" style="margin-top:var(--space-sm)">
           <el-table :data="filteredUsers" highlight-current-row @row-click="selectUser" max-height="260">
             <el-table-column label="名称"><template #default="{row}"><span class="user-name-cell">{{ row.nickname || row.username }}</span></template></el-table-column>
             <el-table-column label="角色" width="70"><template #default="{row}"><el-tag :type="row.role==='MERCHANT'?'warning':'info'" size="small">{{ row.role==='MERCHANT'?'商家':'用户' }}</el-tag></template></el-table-column>
             <el-table-column label="金额" width="120" align="right"><template #default="{row}"><span class="price-cell">¥{{ amountFor(row).toLocaleString() }}</span></template></el-table-column>
           </el-table>
+          </div>
           <div v-if="pickedUser" class="user-detail">
             <div class="detail-bar">
               <span>{{ pickedUser.nickname || pickedUser.username }} 的{{ pickedUser.role==='MERCHANT' ? '商品销售' : '消费记录' }}</span>
