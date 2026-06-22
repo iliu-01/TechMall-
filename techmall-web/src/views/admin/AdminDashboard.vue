@@ -30,20 +30,23 @@
           <div v-if="pickedUser" class="user-detail">
             <div class="detail-bar">
               <span>{{ pickedUser.nickname || pickedUser.username }} 的{{ pickedUser.role==='MERCHANT' ? '商品销售' : '消费记录' }}</span>
-              <a @click="pickedUser=null" style="color:var(--accent-cyan);cursor:pointer">✕ 关闭</a>
+              <a @click="pickedUser=null; pickedItems=[]" class="detail-close">✕ 关闭</a>
             </div>
-            <el-table :data="pickedItems" size="small" max-height="200">
-              <template v-if="pickedUser.role==='MERCHANT'">
-                <el-table-column prop="productName" label="商品" />
-                <el-table-column prop="quantity" label="销量" width="60" align="center" />
-                <el-table-column prop="amount" label="销售额" width="100" align="right"><template #default="{r}"><span class="price-cell">¥{{ Number(r.amount).toLocaleString() }}</span></template></el-table-column>
-              </template>
-              <template v-else>
-                <el-table-column prop="orderNo" label="订单号" width="180" />
-                <el-table-column prop="amount" label="金额" width="100" align="right"><template #default="{r}"><span class="price-cell">¥{{ Number(r.amount).toLocaleString() }}</span></template></el-table-column>
-                <el-table-column label="商品"><template #default="{r}">{{ r.items?.map((i:any)=>i.productName).join('、') }}</template></el-table-column>
-              </template>
-            </el-table>
+            <div class="table-wrap" v-if="pickedItems.length">
+              <el-table :data="pickedItems" size="small" max-height="200">
+                <template v-if="pickedUser.role==='MERCHANT'">
+                  <el-table-column prop="productName" label="商品" />
+                  <el-table-column prop="quantity" label="销量" />
+                  <el-table-column label="销售额"><template #default="{row}"><span class="price-cell">¥{{ Number(row.amount).toLocaleString() }}</span></template></el-table-column>
+                </template>
+                <template v-else>
+                  <el-table-column prop="orderNo" label="订单号" />
+                  <el-table-column label="金额"><template #default="{row}"><span class="price-cell">¥{{ Number(row.amount).toLocaleString() }}</span></template></el-table-column>
+                  <el-table-column label="商品"><template #default="{row}">{{ row.items?.map((i:any)=>i.productName).join('、') }}</template></el-table-column>
+                </template>
+              </el-table>
+            </div>
+            <div v-else style="text-align:center;color:var(--text-muted);padding:var(--space-md)">暂无交易记录</div>
           </div>
         </div>
         <div class="chart-box">
@@ -263,6 +266,10 @@ onMounted(async () => {
 .chart-header h4 { margin-bottom: 0; }
 .chart-toggle { font-size: 0.75rem; color: var(--accent-cyan); cursor: pointer; user-select: none; }
 .chart-toggle:hover { opacity: 0.8; }
-.merchant-detail { font-size: 0.8rem; color: var(--text-secondary); margin-top: var(--space-sm); }
+.detail-close { font-size: 0.8rem; color: var(--accent-cyan); cursor: pointer; }
+.detail-close:hover { opacity: 0.8; }
+.user-name-cell { cursor: pointer; }
+.user-detail { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-subtle); }
+.detail-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); font-size: 0.85rem; font-weight: 600; }
 @media (max-width: 768px) { .stat-cards { grid-template-columns: repeat(2,1fr); } .chart-row { grid-template-columns: 1fr; } }
 </style>
